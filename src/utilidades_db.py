@@ -9,7 +9,7 @@ import os
 
 #Definição do caminho do banco de dados
 CAMINHO_DIR_ATUAL = os.path.dirname(os.path.abspath(__file__))
-CAMINHO_RAIZ = os.path.abspath(os.path.join(CAMINHO_DIR_ATUAL), os.pardir)
+CAMINHO_RAIZ = os.path.abspath(os.path.join(CAMINHO_DIR_ATUAL, os.pardir))
 CAMINHO_BD = os.path.join(CAMINHO_RAIZ, 'data', 'bd_projeto.db')
 
 def obter_conexao():
@@ -27,3 +27,19 @@ def obter_conexao():
   except sqlite3.Error as e:
     print(f"Erro ao conectar com banco de dados usando o caminho '{CAMINHO_BD}': {e}")
     raise
+
+#Teste de conexão
+if __name__ == "__main__":
+    print(f"Tentando conectar ao banco de dados em: {CAMINHO_BD}")
+    try:
+        conn = obter_conexao()
+        print("Conexão com o banco de dados estabelecida com sucesso!")
+        #cria um cursor para garantir que a conexão está ativa
+        cursor = conn.cursor()
+        cursor.close()
+        conn.close()
+        print("Conexão fechada.")
+    except sqlite3.Error as e:
+        print(f"Falha ao conectar ao banco de dados: {e}")
+    except Exception as e:
+        print(f"Ocorreu um erro inesperado: {e}")

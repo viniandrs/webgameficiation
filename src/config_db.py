@@ -86,3 +86,13 @@ def criar_tabelas(caminho: str):
   except sqlite3.Error as e:
     print(f"Erro ao criar tabelas: {e}")
 
+#Teste de criação de tabelas
+if __name__ == "__main__":
+    print("Executando teste de criação de tabelas")
+    try:
+        criar_tabelas()
+        print("Teste de criação de tabelas concluído.")
+    except sqlite3.Error as e:
+        print(f"Erro no teste de criação de tabelas: {e}")
+    except Exception as e:
+        print(f"Ocorreu um erro inesperado durante a criação das tabelas: {e}")
