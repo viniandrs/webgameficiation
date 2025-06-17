@@ -1,0 +1,16 @@
+#Arquivos do ambiente virtual
+.venv/
+venv/
+
+#Arquivos Python
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+*.egg-info/
+.pytest_cache/
+
+#Arquivos do banco de dados SQLite
+*.db
+*.sqlite
+*.sqlite3
