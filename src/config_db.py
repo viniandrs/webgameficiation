@@ -79,7 +79,10 @@ def criar_tabelas(caminho: str):
 
   try:
     with obter_conexao() as conexao:
-      pass
-  except sqlite3.Error as erro:
-    pass
+      cursor = conexao.cursor()
+      for sql in sql_tabelas:
+        cursor.execute(sql)
+      print("Tabelas criadas com sucesso")
+  except sqlite3.Error as e:
+    print(f"Erro ao criar tabelas: {e}")
 
