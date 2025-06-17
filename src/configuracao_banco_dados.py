@@ -1,11 +1,11 @@
-#src/config_db.py
+#src/configuracao_banco_dados.py
 
 """
 Módulo responsável pela configuração inicial do banco de dados, incluindo a criação de tabelas
 """
 
 import sqlite3
-from utilidades_db import obter_conexao
+from .utilidades_banco_dados import obter_conexao
 
 def criar_tabelas():
   """
