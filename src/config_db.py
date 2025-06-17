@@ -5,14 +5,11 @@ Módulo responsável pela configuração inicial do banco de dados, incluindo a 
 """
 
 import sqlite3
-from .utilidades_db import obter_conexao
+from utilidades_db import obter_conexao
 
-def criar_tabelas(caminho: str):
+def criar_tabelas():
   """
   Cria as tabelas necessárias no banco de dados SQLite
-  
-  Args:
-  - caminho (str): caminho completo para o banco de dados, caso não existam.
   """
   
   #Tabela com as strings SQL para a criação das tabelas
