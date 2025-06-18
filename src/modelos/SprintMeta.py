@@ -57,12 +57,14 @@ class SprintMeta(ItemDeTrabalho):
             contador_xp_total_tarefas += tarefa.get_xp_valor()
             if tarefa.get_status() == StatusItem.CONCLUIDA:
                 contador_xp_tarefas_concluidas += tarefa.get_xp_valor()
+        if contador_xp_total_tarefas == 0:
+            return 0.0
         return min(1, contador_xp_tarefas_concluidas / contador_xp_total_tarefas)
         
 
     #chamada quando todas as tarefas foram concluidas
     def contribuir_para_projeto(self, projeto: Projeto):
-        if projeto.get_id == self.get_projeto_id():
+        if projeto.get_id() == self.get_projeto_id():
             if all(tarefa.get_status() == StatusItem.CONCLUIDA for tarefa in self.__tarefas):
                 projeto.adicionar_xp(self.get_xp_valor())
 
