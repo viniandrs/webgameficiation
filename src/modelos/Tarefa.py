@@ -1,7 +1,6 @@
 from datetime import date
 from ItemDeTrabalho import ItemDeTrabalho, StatusItem
 from Projeto import Projeto
-from Participacao import Participacao
 
 class Tarefa(ItemDeTrabalho):
 
@@ -60,11 +59,12 @@ class Tarefa(ItemDeTrabalho):
         return 0
     
     #caso a tarefa esteja concluida, chama adicionar_xp do projeto e da participacao envolvidos
-    def contribuir_para_projeto(self, projeto: Projeto, participacao: Participacao):
+    def contribuir_para_projeto(self, projeto: Projeto, participacao: 'Participacao'):
         if self.get_status() == StatusItem.CONCLUIDA:
             if projeto.get_id() == self.get_projeto_id():
                 if participacao.get_id() == self.__participacao_responsavel_id:
-                    projeto.adicionar_xp(self.__xp_valor)
+                    projeto.adicionar_xp(self.get_xp_valor())
+                    participacao.adicionar_xp(self.get_xp_valor())
                 else:
                     raise ValueError("A participacao fornecida não está associada a essa tarefa")   # substituir por um tratamento de erro adequado
             else:
