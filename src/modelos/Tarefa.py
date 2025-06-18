@@ -62,7 +62,7 @@ class Tarefa(ItemDeTrabalho):
     #caso a tarefa esteja concluida, chama adicionar_xp do projeto e da participacao envolvidos
     def contribuir_para_projeto(self, projeto: Projeto, participacao: Participacao):
         if self.get_status() == StatusItem.CONCLUIDA:
-            if projeto.get_id == self.__projeto_id:
+            if projeto.get_id == self.get_projeto_id():
                 if participacao.get_id == self.__participacao_responsavel_id:
                     projeto.adicionar_xp(self.__xp_valor)
                 else:

@@ -62,7 +62,7 @@ class SprintMeta(ItemDeTrabalho):
 
     #chamada quando todas as tarefas foram concluidas
     def contribuir_para_projeto(self, projeto: Projeto):
-        if projeto.get_id == self.__projeto_id:
+        if projeto.get_id == self.get_projeto_id():
             if all(tarefa.get_status() == StatusItem.CONCLUIDA for tarefa in self.__tarefas):
                 projeto.adicionar_xp(self.get_xp_valor())
 
