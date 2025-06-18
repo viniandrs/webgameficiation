@@ -15,7 +15,7 @@ class BaseDao:
     """
     pass
   
-  #Métodos genéricos para interação com a base de dados
+  #Métodos genéricos (protegidos) para interação com a base de dados
 
   def _executar_consulta(self, sql: str, parametros = None):
     """
@@ -93,3 +93,36 @@ class BaseDao:
     except sqlite3.Error as e:
       print(f"Erro ao obter resultado SQL: {sql}\n. Erro: {e}")
       raise
+
+  # Métodos abstratos
+  @abstractmethod
+  def _obter_nome_tabela(self) -> str:
+    """
+    Retorna o nome da tabela do banco de dados
+    """
+    pass
+  
+  @abstractmethod
+  def _converter_resultado_para_entidade(self, linha_resultado):
+    """
+    Converte uma linha de resultado do banco de dados (sqlite3.Row)
+    em uma instância da entidade de modelo correspondente
+    """
+    pass
+
+  @abstractmethod
+  def _converter_entidade_para_parametros(self, linha_resultado):
+    """
+    Converte uma instância da entidade em uma tupla com os valores dos atributos na ordem correta
+    para a inserção no banco de dados
+    """
+    pass
+
+  @abstractmethod
+  def _obter_id_entidade(self, entidade):
+    """
+    Encontra o id de uma instância da entidade
+    """
+    pass
+
+  #Métodos genéricos (públicos) para interação com o banco de dados
