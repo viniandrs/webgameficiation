@@ -1,6 +1,7 @@
 from datetime import date
 from ItemDeTrabalho import ItemDeTrabalho, StatusItem
 from Tarefa import Tarefa
+from Projeto import Projeto
 
 class SprintMeta(ItemDeTrabalho):
 
@@ -56,14 +57,15 @@ class SprintMeta(ItemDeTrabalho):
             contador_xp_total_tarefas += tarefa.get_xp_valor()
             if tarefa.get_status() == StatusItem.CONCLUIDA:
                 contador_xp_tarefas_concluidas += tarefa.get_xp_valor()
-        return max(1, contador_xp_tarefas_concluidas / contador_xp_total_tarefas)
+        return min(1, contador_xp_tarefas_concluidas / contador_xp_total_tarefas)
         
 
     #chamada quando todas as tarefas foram concluidas
-    def contribuir_para_projeto(self):
-        # chamar metodo de adicionar_xp do projeto com xp_valor do sprint como parametro
-        pass
-        
+    def contribuir_para_projeto(self, projeto: Projeto):
+        if projeto.get_id == self.__projeto_id:
+            if all(tarefa.get_status() == StatusItem.CONCLUIDA for tarefa in self.__tarefas):
+                projeto.adicionar_xp(self.get_xp_valor())
+
     
     #retorna o tipo de ItemDeTrabalho (SprintMeta)
     def obter_tipo_item(self):
