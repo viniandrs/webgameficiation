@@ -1,4 +1,5 @@
 from Participacao import Participacao
+from Tarefa import Tarefa
 
 class Dono(Participacao):
 
@@ -25,7 +26,7 @@ class Dono(Participacao):
         return True
     
     #Retorna se pode atualizar status (True)
-    def pode_atualizar_status(self) -> bool:
+    def pode_atualizar_status(self, tarefa: Tarefa) -> bool:
         return True
 
 

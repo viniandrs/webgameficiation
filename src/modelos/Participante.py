@@ -1,4 +1,5 @@
 from Participacao import Participacao
+from Tarefa import Tarefa
 
 class Participante(Participacao):
 
@@ -25,8 +26,9 @@ class Participante(Participacao):
         return False
     
     #Retorna se pode atualizar status: True caso seja responsavel pela tarefa e False caso contrário
-    def pode_atualizar_status(self) -> bool:
-        # FALTA: validar se o participante é o responsável pela tarefa. se for, retorna True, se nao for retorna False
-        return True # apenas para testes
-        
+    def pode_atualizar_status(self, tarefa: Tarefa) -> bool:
+        if tarefa.get_participacao_responsavel_id() == self.get_id():
+            return True
+        return False
+
 

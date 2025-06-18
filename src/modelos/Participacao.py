@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from IGerenciadorXP import IGerenciadorXP
+from Tarefa import Tarefa
 
 class Participacao(IGerenciadorXP):
 
@@ -74,5 +75,5 @@ class Participacao(IGerenciadorXP):
         pass
 
     @abstractmethod
-    def pode_atualizar_status(self) -> bool:
+    def pode_atualizar_status(self, tarefa: Tarefa) -> bool:
         pass
