@@ -1,4 +1,6 @@
-class Projeto:
+from IGerenciadorXP import IGerenciadorXP
+
+class Projeto(IGerenciadorXP):
 
     #Construtor da classe Projeto
     def __init__(self, id: int, nome: str, descricao: str, xp_meta: int):
@@ -8,6 +10,7 @@ class Projeto:
         self.__xp_acumulado = 0
         self.__xp_meta = xp_meta
     
+
     #getters:
 
     #getter da id do Projeto
@@ -26,9 +29,6 @@ class Projeto:
     def get_xp_meta(self) -> int:
         return self.__xp_meta
     
-    #getter do xp acumulado do Projeto
-    def get_xp_acumulado(self) -> int:
-        return self.__xp_acumulado
 
     #setters:
 
@@ -57,11 +57,16 @@ class Projeto:
         if valor > 0:
             self.__xp_acumulado = max(0, self.__xp_acumulado - valor)
 
+    #retorna o xp acumulado atual do projeto, funciona como getter de xp_acumulado do Projeto
+    def get_xp(self) -> int:
+        return self.__xp_acumulado
+
     #retorna o progresso total de xp do projeto, de 0 a 1
     def progresso_total(self) -> float:
         if self.__xp_meta == 0:     # pra ter certeza que nao sera dividido por 0
             return 0.0
         return min(1.0, self.__xp_acumulado / self.__xp_meta)
+
 
     #Representação textual:
 

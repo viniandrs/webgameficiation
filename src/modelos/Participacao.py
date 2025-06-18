@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
+from IGerenciadorXP import IGerenciadorXP
 
-class Participacao(ABC):
+class Participacao(IGerenciadorXP):
 
     #Construtor da classe Participacao
     def __init__(self, id: int, usuario_id: int, projeto_id: int):
