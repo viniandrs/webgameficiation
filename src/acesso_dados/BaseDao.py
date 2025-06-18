@@ -126,3 +126,37 @@ class BaseDao:
     pass
 
   #Métodos genéricos (públicos) para interação com o banco de dados
+
+  def buscar_por_id(self, id_entidade):
+    """
+    Busca uma entidade no banco de dados pelo id
+
+    Args:
+      id_entidade: o identificador da entidade a ser buscada
+    
+    Returns:
+      objeto ou None: Objeto da entidade correspondente ou None caso não seja encontrado
+    
+    Raises:
+      sqlite3.Error: Se ocorrer algum erro durante a execução da consulta
+    """
+
+    sql = f"SELECT * FROM {self._obter_nome_tabela()} WHERE id = ?"
+    resultado_consulta = self._obter_um(sql, (id_entidade,))
+    if(resultado_consulta):
+      return self._converter_resultado_para_entidade(resultado_consulta)
+    return None
+  
+  def remover(self, id_entidade):
+    """
+    Remove uma entidade do banco de dados pelo id
+
+    Args:
+      id_entidade: o identificador da entidade a ser removida
+    
+    Raises:
+      sqlite3.Error: Se ocorrer algum erro durante a execução da consulta
+    """
+
+    sql = f"DELETE * FROM {self._obter_nome_tabela()} WHERE id = ?"
+    self._executar_consulta(sql, (id_entidade, ))
