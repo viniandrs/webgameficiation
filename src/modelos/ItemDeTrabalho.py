@@ -35,7 +35,7 @@ class ItemDeTrabalho(ABC):
     
     #getter de descricao do ItemDeTrabalho
     def get_descricao(self) -> str:
-        return self.__nome
+        return self.__descricao
     
     #getter de valor de xp do ItemDeTrabalho
     def get_xp_valor(self) -> int:
