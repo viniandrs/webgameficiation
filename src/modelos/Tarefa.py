@@ -48,7 +48,7 @@ class Tarefa(ItemDeTrabalho):
 
     #retorna dados sobre a tarefa em formato de string
     def __str__(self):
-        return (f"Tarefa '{self.__nome}':\nStatus: {self.get_status().name}\nXP: {self.__xp_valor}\nPrazo: {self.__prazo}")
+        return (f"Tarefa '{self.get_nome()}':\nStatus: {self.get_status().name}\nXP: {self.get_xp_valor()}\nPrazo: {self.__prazo}")
     
 
     #Implementação dos métodos abstratos de ItemDeTrabalho:
@@ -62,8 +62,8 @@ class Tarefa(ItemDeTrabalho):
     #caso a tarefa esteja concluida, chama adicionar_xp do projeto e da participacao envolvidos
     def contribuir_para_projeto(self, projeto: Projeto, participacao: Participacao):
         if self.get_status() == StatusItem.CONCLUIDA:
-            if projeto.get_id == self.get_projeto_id():
-                if participacao.get_id == self.__participacao_responsavel_id:
+            if projeto.get_id() == self.get_projeto_id():
+                if participacao.get_id() == self.__participacao_responsavel_id:
                     projeto.adicionar_xp(self.__xp_valor)
                 else:
                     raise ValueError("A participacao fornecida não está associada a essa tarefa")   # substituir por um tratamento de erro adequado
