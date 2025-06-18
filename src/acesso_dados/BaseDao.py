@@ -4,7 +4,7 @@ import sqlite3
 from abc import ABC, abstractmethod
 from ..utilidades_banco_dados import obter_conexao
 
-class BaseDao:
+class BaseDao(ABC):
   """
   Classe base abstrata para todas as operações com o banco de dados (CRUD)
   """
