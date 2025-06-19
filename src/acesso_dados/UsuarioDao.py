@@ -67,6 +67,25 @@ class UsuarioDao(BaseDao):
       usuario.get_senha_hash(),
     )
   
+  def _converter_entidade_para_parametros_atualizacao(self, usuario: Usuario) -> tuple:
+    """
+    Converte uma instância de Usuario em uma tupla com os valores dos atributos na ordem correta
+    para a atualização no banco de dados (nome, email, senha, id)
+    
+    Args:
+      usuario (Usuario): Instância da classe de modelo
+    
+    Returns:
+      tuple: Tupla com os valores dos atributos em ordem para a atualização
+    """
+
+    return (
+      usuario.get_nome(),
+      usuario.get_email(),
+      usuario.get_senha_hash(),
+      usuario.get_id()
+    )
+  
   # Métodos (públicos) CRUD específicos pars Usuario
 
   def inserir(self, usuario: Usuario):
