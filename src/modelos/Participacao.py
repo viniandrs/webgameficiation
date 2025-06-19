@@ -1,15 +1,16 @@
 from abc import ABC, abstractmethod
 from IGerenciadorXP import IGerenciadorXP
+from .Tarefa import Tarefa
 
 class Participacao(IGerenciadorXP):
 
     #Construtor da classe Participacao
-    def __init__(self, id: int, usuario_id: int, projeto_id: int):
+    def __init__(self, usuario_id: int, projeto_id: int, id: int | None = None, xp_participacao: int = 0, ativa: bool = True):
         self.__id = id
         self.__usuario_id = usuario_id
         self.__projeto_id = projeto_id
-        self.__xp_participacao = 0
-        self.__ativa = True
+        self.__xp_participacao = xp_participacao
+        self.__ativa = ativa
 
 
     #Getters:
