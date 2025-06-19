@@ -138,6 +138,20 @@ class BaseDao(ABC):
     """
     pass
 
+  @abstractmethod
+  def _converter_entidade_para_parametros_atualizacao(self, entidade):
+    """
+    Converte uma instância da entidade em uma tupla com os valores dos atributos na ordem correta
+    para a atualização no banco de dados
+
+    Args:
+      entidade: Instância da classe de modelo
+    
+    Returns:
+      tuple: Tupla com os valores dos atributos em ordem para a atualização
+    """
+    pass
+
   #Métodos genéricos (públicos) para interação com o banco de dados
 
   def buscar_por_id(self, id_entidade):
