@@ -28,7 +28,6 @@ class BaseDao(ABC):
     Raises:
       sqlite3.Error: Se ocorrer um erro durante a execução da consulta
     """
-
     try:
       with obter_conexao() as conexao:
         cursor = conexao.cursor()
@@ -53,8 +52,7 @@ class BaseDao(ABC):
 
     Raises:
       sqlite3.Error: Se ocorrer algum erro durante a execução da consulta
-    """
-    
+    """    
     try:
       with obter_conexao() as conexao:
         cursor = conexao.cursor()
@@ -76,12 +74,11 @@ class BaseDao(ABC):
       parametros (tuple): Tupla de parâmetros para a consulta, None como padrão
 
     Returns:
-      lista de sqlite3.Row ou None: Resultado da consulta como uma lista de objetos sqlite3.Row ou None, caso não tenha resultado
+      lista de sqlite3.Row: Resultado da consulta como uma lista de objetos sqlite3.Row ou uma lista vazia caso não tenha resultado
 
     Raises:
       sqlite3.Error: Se ocorrer algum erro durante a execução da consulta
     """
-    
     try:
       with obter_conexao() as conexao:
         cursor = conexao.cursor()
@@ -148,7 +145,6 @@ class BaseDao(ABC):
     Raises:
       sqlite3.Error: Se ocorrer algum erro durante a execução da consulta
     """
-
     sql = f"SELECT * FROM {self._obter_nome_tabela()} WHERE id = ?"
     resultado_consulta = self._obter_um(sql, (id_entidade,))
     if resultado_consulta:
@@ -165,6 +161,5 @@ class BaseDao(ABC):
     Raises:
       sqlite3.Error: Se ocorrer algum erro durante a execução da consulta
     """
-
-    sql = f"DELETE * FROM {self._obter_nome_tabela()} WHERE id = ?"
+    sql = f"DELETE FROM {self._obter_nome_tabela()} WHERE id = ?"
     self._executar_consulta(sql, (id_entidade, ))
