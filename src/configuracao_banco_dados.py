@@ -31,7 +31,7 @@ sql_tabelas = [
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     usuario_id INTEGER NOT NULL,
     projeto_id INTEGER NOT NULL,
-    xp_participacao REAL NOT NULL DEFAULT 0.0,
+    xp_participacao INT NOT NULL DEFAULT 0,
     participacao_habilitada BOOLEAN NOT NULL,
     classificacao TEXT NOT NULL,
     UNIQUE(usuario_id, projeto_id),
@@ -45,7 +45,7 @@ sql_tabelas = [
     projeto_id INTEGER NOT NULL,
     titulo TEXT NOT NULL,
     descricao TEXT,
-    xp_valor REAL NOT NULL,
+    xp_valor INT NOT NULL,
     status TEXT NOT NULL,
     participacao_responsavel_id INTEGER,
     prazo TEXT, -- Formato ISO 8601 YYYY-MM-DD HH:MM:SS
@@ -61,7 +61,7 @@ sql_tabelas = [
     projeto_id INTEGER NOT NULL,
     nome TEXT NOT NULL,
     descricao TEXT,
-    xp_bonus REAL NOT NULL DEFAULT 0.0,
+    xp_bonus INT NOT NULL DEFAULT 0.0,
     status TEXT NOT NULL,
     data_alvo TEXT, -- Formato ISO 8601 YYYY-MM-DD HH:MM:SS
     FOREIGN KEY (projeto_id) REFERENCES projetos(id) ON DELETE CASCADE ON UPDATE CASCADE
