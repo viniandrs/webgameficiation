@@ -3,6 +3,8 @@
 import unittest
 from src.modelos.Usuario import Usuario
 from src.acesso_dados.UsuarioDao import UsuarioDao
+from utilidades_banco_dados import obter_conexao_teste
+from configuracao_banco_dados import criar_tabelas_em_conexao, apagar_tabelas_em_conexao
 
 class TestUsuarioDao(unittest.TestCase):
   """
@@ -13,13 +15,26 @@ class TestUsuarioDao(unittest.TestCase):
     """
     Método de preparação do ambiente de testes a ser executado antes de cada teste
     """
-    pass
+    #Cria uma conexão com o banco de dados
+    self.conexao = obter_conexao_teste()
+
+    #Apaga as tabelas existentes
+    apagar_tabelas_em_conexao(self.conexao)
+
+    #Cria as tabelas necessárias para a manipulação do banco de dados
+    criar_tabelas_em_conexao(self.conexao)
+
+    #Salva as alterações executadas no banco de dados
+    self.conexao.commit()
+
+    self.dao = UsuarioDao()
 
   def tearDown(self):
     """
     Método de limpeza do ambiente de testes a ser executado ao final de cada teste
     """
-    pass
+    
+    self.conexao.close() #Encerra a conexão com o banco de dados
 
   #Métodos de testes
 
