@@ -3,11 +3,11 @@ from IGerenciadorXP import IGerenciadorXP
 class Projeto(IGerenciadorXP):
 
     #Construtor da classe Projeto
-    def __init__(self, id: int, nome: str, descricao: str, xp_meta: int):
+    def __init__(self, nome: str, descricao: str, xp_acumulado: int, xp_meta: int, id: int | None = None):
         self.__id = id
         self.__nome = nome
         self.__descricao = descricao
-        self.__xp_acumulado = 0
+        self.__xp_acumulado = xp_acumulado
         self.__xp_meta = xp_meta
     
 
@@ -31,6 +31,10 @@ class Projeto(IGerenciadorXP):
     
 
     #setters:
+
+    #setter de id, altera id do Projeto
+    def set_id(self, novo_id: int):
+        self.__id = novo_id
 
     #setter de nome, altera nome do Projeto
     def set_nome(self, novo_nome: str):
