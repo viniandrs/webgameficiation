@@ -101,13 +101,7 @@ class ProjetoDao(BaseDao):
     INSERT INTO {self._obter_nome_tabela()} (nome, descricao, xp_acumulado, xp_meta) 
     Values (?, ?, ?, ?);
     """
-    parametros_sql = self._converter_entidade_para_parametros_insercao(projeto)
-    id_gerado = self._executar_consulta(sql, parametros_sql, True)
-
-    if id_gerado:
-      projeto.set_id(id_gerado)
-    
-    return projeto
+    return self._realizar_insercao_e_atribuir_id(projeto, sql)
   
   def atualizar(self, projeto: Projeto):
     """
@@ -119,5 +113,4 @@ class ProjetoDao(BaseDao):
     SET nome = ?, descricao = ?, xp_acumulado = ?, xp_meta = ?
     WHERE id = ?
     """
-    parametros = self._converter_projeto_para_parametros_atualizacao(projeto)
-    self._executar_consulta(sql, parametros)
+    self._realizar_atualizacao(projeto, sql)

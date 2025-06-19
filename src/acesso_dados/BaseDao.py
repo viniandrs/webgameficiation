@@ -152,6 +152,38 @@ class BaseDao(ABC):
     """
     pass
 
+  #Métodos protegidos para inserção e atualização
+
+  def _realizar_insercao_e_atribuir_id(self, entidade, sql_insercao):
+    """
+    Insere um registro no banco de dados e atualiza o id na entidade correspondente
+
+    Args:
+      entidade: Instância da classe modelo 
+      sql_insercao: String SQL para realizar a inserção
+    
+    Returns:
+      entidade: A mesma entidade recebida, agora com id preenchido
+    """
+    parametros_sql = self._converter_entidade_para_parametros_insercao(entidade)
+    id_gerado = self._executar_consulta(sql_insercao, parametros_sql, True)
+
+    if id_gerado:
+      entidade.set_id(id_gerado)
+     
+    return entidade
+  
+  def _realizar_atualizacao(self, entidade, sql_atualizacao):
+    """
+    Atualiza um registro no banco de dados e atualiza o id na entidade correspondente
+
+    Args:
+      entidade: Instância da classe modelo 
+      sql_atualizacao: String SQL para realizar a inserção
+    """
+    parametros = self._converter_entidade_para_parametros_atualizacao(entidade)
+    self._executar_consulta(sql_atualizacao, parametros)
+
   #Métodos genéricos (públicos) para interação com o banco de dados
 
   def buscar_por_id(self, id_entidade):
