@@ -17,16 +17,20 @@ class BaseDao(ABC):
   
   #Métodos genéricos (protegidos) para interação com a base de dados
 
-  def _executar_consulta(self, sql: str, parametros: tuple = None):
+  def _executar_consulta(self, sql: str, parametros: tuple = None, retornar_lastrowid: bool = False):
     """
     Executa uma consulta na base de dados que não retorna resultados, como Insert, Update e Delete.
 
     Args:
       sql (str): String SQL a ser executada
       parametros (tuple): Tupla de parâmetros para a consulta, None como padrão
+      retornar_lastrowid (bool): se True tenta retornar o último id geraldo.
 
     Raises:
       sqlite3.Error: Se ocorrer um erro durante a execução da consulta
+
+    Returns:
+      int ou None: O último id gerado, caso retornar_latrowid seja True, None caso contrário
     """
     try:
       with obter_conexao() as conexao:
@@ -35,6 +39,10 @@ class BaseDao(ABC):
           cursor.execute(sql, parametros)
         else:
           cursor.execute(sql)
+
+        if retornar_lastrowid:
+          return cursor.lastrowid
+        return None
     except sqlite3.Error as e:
       print(f"Erro ao executar consulta SQL: {sql}.\nErro: {e}")
       raise
