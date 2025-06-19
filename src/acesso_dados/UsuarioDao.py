@@ -85,7 +85,7 @@ class UsuarioDao(BaseDao):
 
     sql = f"INSERT INTO {self._obter_nome_tabela()} (nome, email, senha) Values (?, ?, ?);"
     parametros_sql = self._converter_entidade_para_parametros_insercao(usuario)
-    id_gerado = self._executar_consulta(sql, parametros_sql)
+    id_gerado = self._executar_consulta(sql, parametros_sql, True)
 
     if id_gerado:
       usuario.set_id(id_gerado)
