@@ -1,8 +1,7 @@
 # tests/test_usuario_modelo.py
 
 import unittest
-from ..src.modelos.Usuario import Usuario
-from ..src.modelos.Seguranca import gerar_hash_senha
+from src.modelos.Usuario import Usuario
 
 class TestUsuarioModelo(unittest.TestCase):
   """
@@ -25,7 +24,7 @@ class TestUsuarioModelo(unittest.TestCase):
 
   def test_criar_usuario_construtor(self):
     """Verifica se o usuário é criado corretamente"""
-    self.assertEqual(self.novo_usuario.get_name(), "Diogo")
+    self.assertEqual(self.novo_usuario.get_nome(), "Diogo")
     self.assertEqual(self.novo_usuario.get_email(), "diogo@gmail.com")
     self.assertNotEqual(self.novo_usuario.get_senha_hash(), "minha_senha")
 
@@ -33,7 +32,7 @@ class TestUsuarioModelo(unittest.TestCase):
     """Verifica se o nome do usuário pode ser alterado"""
     novo_nome = "Diogo Barros"
     self.novo_usuario.set_nome(novo_nome)
-    self.assertEqual(self.novo_usuario.get_nome, novo_nome)
+    self.assertEqual(self.novo_usuario.get_nome(), novo_nome)
 
   def test_verificar_senha_correta(self):
     """Verifica se a checagem da senha retorna True com a senha correta"""
@@ -59,7 +58,8 @@ class TestUsuarioModelo(unittest.TestCase):
     nova_senha = "nova_senha"
     self.assertFalse(self.novo_usuario.alterar_senha(senha_errada, nova_senha))
     self.assertFalse(self.novo_usuario.verificar_senha(senha_errada))
-    self.assertEqual(self.novo_usuario.get_senha_hash, hash_senha_certa)
+    self.assertEqual(self.novo_usuario.get_senha_hash(), hash_senha_certa)
 
 #Executa os testes quando o arquivo é rodado diretamente
-if __name__ == '__main__': unittest.main()
+if __name__ == '__main__': 
+  unittest.main()
