@@ -22,6 +22,10 @@ class Usuario:
     #getter de email, retorna email do usuario
     def get_email(self) -> str:
         return self.__email
+
+    #getter de senha, retorna o hash da senha do usuario
+    def get_senha_hash(self) -> str:
+        return self.__senha_hash
     
     #setters:
 
