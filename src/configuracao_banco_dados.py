@@ -22,8 +22,8 @@ sql_tabelas = [
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nome TEXT NOT NULL,
     descricao TEXT,
-    xp_acumulado REAL NOT NULL DEFAULT 0.0,
-    xp_meta REAL NOT NULL
+    xp_acumulado INT NOT NULL DEFAULT 0,
+    xp_meta INT NOT NULL DEFAULT 0
   );
   """,
   """
