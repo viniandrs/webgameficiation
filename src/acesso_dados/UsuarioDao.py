@@ -21,7 +21,7 @@ class UsuarioDao(BaseDao):
     Retorna o nome da tabela correspondente à Usuario no bd
     
     Returns:
-      (str): O nome da tabela (usuarios)
+      str: O nome da tabela (usuarios)
     """
     return "usuarios"
   

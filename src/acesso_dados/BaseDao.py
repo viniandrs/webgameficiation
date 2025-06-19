@@ -106,7 +106,7 @@ class BaseDao(ABC):
     Retorna o nome da tabela do banco de dados
 
     Returns:
-      (str): O nome da tabela
+      str: O nome da tabela
     """
     pass
   

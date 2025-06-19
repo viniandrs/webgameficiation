@@ -21,7 +21,7 @@ class ProjetoDao(BaseDao):
     Retorna o nome da tabela correspondente à Projeto no bd
     
     Returns:
-      (str): O nome da tabela (projetos)
+      str: O nome da tabela (projetos)
     """
     return "projetos"
   
@@ -106,6 +106,9 @@ class ProjetoDao(BaseDao):
   def atualizar(self, projeto: Projeto):
     """
     Atualiza todos os atributos editáveis de um projeto no bd
+
+    Args:
+      projeto (Projeto): instância da classe Projeto a ser atualizado
     """
 
     sql = f"""
