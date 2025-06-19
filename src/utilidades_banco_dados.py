@@ -34,7 +34,15 @@ def obter_conexao():
     print(f"Erro ao conectar com banco de dados usando o caminho '{CAMINHO_BD}': {e}")
     raise
 
-#Teste de conexão
+def obter_conexao_teste():
+    """
+    Retorna uma conexão com um banco de dados SQLite em memória (não persistente).
+    """
+    conexao = sqlite3.connect(':memory:')
+    conexao.row_factory = sqlite3.Row
+    return conexao
+
+#Teste de sanidade para a conexão com banco de dados
 if __name__ == "__main__":
     print(f"Tentando conectar ao banco de dados em: {CAMINHO_BD}")
     try:
