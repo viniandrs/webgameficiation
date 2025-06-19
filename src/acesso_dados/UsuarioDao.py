@@ -80,14 +80,17 @@ class UsuarioDao(BaseDao):
       sqlite3.Error: Se ocorrer algum erro durante a inserção
     
     Returns:
-      id (int): Identificador do usuário gerado pelo banco de dados
+      Usuário: A mesma instância de Usuário passada, agora com id preenchido (no caso de sucesso na inserção)
     """
 
     sql = f"INSERT INTO {self._obter_nome_tabela()} (nome, email, senha) Values (?, ?, ?);"
     parametros_sql = self._converter_entidade_para_parametros_insercao(usuario)
-    self._executar_consulta(sql, parametros_sql)
+    id_gerado = self._executar_consulta(sql, parametros_sql)
 
-    #incluir lógica para retornar id do usuário cadastrado
+    if id_gerado:
+      usuario.set_id(id_gerado)
+    
+    return usuario
     
     
 
