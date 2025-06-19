@@ -13,11 +13,11 @@ class BaseDao(ABC):
     """
     Inicializa a classe BaseDao
     """
-    pass
+    super().__init__()
   
   #Métodos genéricos (protegidos) para interação com a base de dados
 
-  def _executar_consulta(self, sql: str, parametros = None):
+  def _executar_consulta(self, sql: str, parametros: tuple = None):
     """
     Executa uma consulta na base de dados que não retorna resultados, como Insert, Update e Delete.
 
@@ -32,7 +32,7 @@ class BaseDao(ABC):
     try:
       with obter_conexao() as conexao:
         cursor = conexao.cursor()
-        if(parametros):
+        if parametros:
           cursor.execute(sql, parametros)
         else:
           cursor.execute(sql)
@@ -40,7 +40,7 @@ class BaseDao(ABC):
       print(f"Erro ao executar consulta SQL: {sql}.\nErro: {e}")
       raise
   
-  def _obter_um(self, sql: str, parametros = None):
+  def _obter_um(self, sql: str, parametros: tuple = None):
     """
     Executa uma consulta que tenta obter um registro da base de dados
     
@@ -58,7 +58,7 @@ class BaseDao(ABC):
     try:
       with obter_conexao() as conexao:
         cursor = conexao.cursor()
-        if(parametros):
+        if parametros:
           cursor.execute(sql, parametros)
         else:
           cursor.execute(sql)
@@ -67,7 +67,7 @@ class BaseDao(ABC):
       print(f"Erro ao obter resultado SQL: {sql}\n. Erro: {e}")
       raise
   
-  def _obter_todos(self, sql:str, parametros = None):
+  def _obter_todos(self, sql:str, parametros: tuple = None):
     """
     Executa uma consulta que tenta obter múltiplos registros da base de dados
 
@@ -85,7 +85,7 @@ class BaseDao(ABC):
     try:
       with obter_conexao() as conexao:
         cursor = conexao.cursor()
-        if(parametros):
+        if parametros:
           cursor.execute(sql, parametros)
         else:
           cursor.execute(sql)
@@ -99,6 +99,9 @@ class BaseDao(ABC):
   def _obter_nome_tabela(self) -> str:
     """
     Retorna o nome da tabela do banco de dados
+
+    Returns:
+      (str): O nome da tabela
     """
     pass
   
@@ -107,21 +110,26 @@ class BaseDao(ABC):
     """
     Converte uma linha de resultado do banco de dados (sqlite3.Row)
     em uma instância da entidade de modelo correspondente
+
+    Args: 
+      linha_resultado (sqlite3.Row): Linha do resultado obtido no banco de dados
+
+    Return:
+      objeto: Instância da classe de modelo correspondente 
     """
     pass
 
   @abstractmethod
-  def _converter_entidade_para_parametros(self, linha_resultado):
+  def _converter_entidade_para_parametros_insercao(self, entidade):
     """
     Converte uma instância da entidade em uma tupla com os valores dos atributos na ordem correta
     para a inserção no banco de dados
-    """
-    pass
 
-  @abstractmethod
-  def _obter_id_entidade(self, entidade):
-    """
-    Encontra o id de uma instância da entidade
+    Args:
+      entidade: Instância da classe de modelo
+    
+    Returns:
+      tuple: Tupla com os valores dos atributos em ordem para a inserção
     """
     pass
 
@@ -143,7 +151,7 @@ class BaseDao(ABC):
 
     sql = f"SELECT * FROM {self._obter_nome_tabela()} WHERE id = ?"
     resultado_consulta = self._obter_um(sql, (id_entidade,))
-    if(resultado_consulta):
+    if resultado_consulta:
       return self._converter_resultado_para_entidade(resultado_consulta)
     return None
   
