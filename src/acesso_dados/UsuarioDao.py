@@ -36,11 +36,17 @@ class UsuarioDao(BaseDao):
     Return:
       Usuario: Instância da classe Usuario preenchida com os dados da consulta 
     """
-    return Usuario(
+
+    senha_hash = linha_resultado['senha']
+
+    if isinstance(senha_hash, str):
+      senha_hash = senha_hash.encode('utf-8')
+
+    return Usuario.criar_com_hash(
       linha_resultado['id'],
       linha_resultado['nome'],
       linha_resultado['email'],
-      linha_resultado['senha']
+      senha_hash
     )
   
   def _converter_entidade_para_parametros_insercao(self, usuario: Usuario) -> tuple:
@@ -58,7 +64,7 @@ class UsuarioDao(BaseDao):
     return (
       usuario.get_nome(),
       usuario.get_email(),
-      usuario.get_senha(),
+      usuario.get_senha_hash(),
     )
   
   # Métodos (públicos) CRUD específicos pars Usuario
@@ -72,10 +78,32 @@ class UsuarioDao(BaseDao):
     
     Raises:
       sqlite3.Error: Se ocorrer algum erro durante a inserção
+    
+    Returns:
+      id (int): Identificador do usuário gerado pelo banco de dados
     """
 
     sql = f"INSERT INTO {self._obter_nome_tabela()} (nome, email, senha) Values (?, ?, ?);"
-    parametros_sql = self._converter_entidade_para_parametros(usuario)
+    parametros_sql = self._converter_entidade_para_parametros_insercao(usuario)
     self._executar_consulta(sql, parametros_sql)
 
-  
+    #incluir lógica para retornar id do usuário cadastrado
+    
+    
+
+  def buscar_por_email(self, email: str):
+    """
+    Busca um usuário no banco de dados pelo email
+
+    Args:
+      email(str): endereço de email que será buscado
+    
+    Returns:
+      Usuário ou None: Uma instância de Usuario, ou None caso não seja encontrado
+    """
+
+    sql = f"SELECT id, nome, email, senha FROM {self._obter_nome_tabela()} WHERE email = ?"
+    resultado_consulta = self._obter_um(sql, (email,))
+    if resultado_consulta:
+      return self._converter_resultado_para_entidade(resultado_consulta)
+    return None
