@@ -119,26 +119,6 @@ class ProjetoDao(BaseDao):
     WHERE id = ?
     """
     self._realizar_atualizacao(projeto, sql)
-
-  def buscar_projetos_por_usuario(self, usuario_id: int):
-    """
-    Encontra todos os projetos em que o usuário tem Participação ativa
-
-    Args:
-      usuario_id(int): Identificador do usuário usado para a busca
-
-    Returns: 
-      Lista de Projetos: lista com todos os projetos com vínculo ativo com o usuário
-    """
-
-    sql = f"""
-    SELECT p.id, p.nome, p.descricao, p.xp_acumulado, p.xp_meta FROM projetos as p
-    JOIN participacoes as part ON p.id = part.projeto_id
-    WHERE part.usuario_id = ? AND participacao_habilitada = 1 
-    """
-
-    resultado = self._obter_todos(sql, (usuario_id,))
-    return [self._converter_resultado_para_entidade(linha) for linha in resultado]
   
   def buscar_membros_do_projeto(self, projeto_id: int):
     """

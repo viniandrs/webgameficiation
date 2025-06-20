@@ -123,3 +123,46 @@ class UsuarioDao(BaseDao):
     if resultado_consulta:
       return self._converter_resultado_para_entidade(resultado_consulta)
     return None
+  
+  def buscar_participacoes_usuario(self, usuario_id: int):
+    """
+    Busca as participações de um usuário específico
+
+    Args:
+      usuario_id (int): O identificador do usuário usado na busca
+
+     Returns:
+      lista de dict: Lista de dicionários com os dados da participação e projeto do usuario
+    """
+
+    sql = f"""
+    SELECT
+      part.id AS participacao_id,
+      part.xp_participacao,
+      part.classificacao,
+      part.participacao_habilitada,
+      p.id AS projeto_id,
+      p.nome AS projeto_nome,
+      p.xp_acumulado AS projeto_xp_acumulado,
+      p.xp_meta AS projeto_xp_meta
+      FROM participacoes AS part
+      JOIN projetos AS p ON part.projeto_id = p.id
+      WHERE part.usuario_id = ? AND part.participacao_habilitada = 1;
+    """
+    resultados = self._obter_todos(sql, (usuario_id,))
+
+    participacoes = []
+    for linha in resultados:
+      participacoes.append({
+        'participacao_id': linha['participacao_id'],
+        'xp_participacao': linha['xp_participacao'],
+        'classificacao': linha['classificacao'],
+        'participacao_habilitada': linha['participacao_habilitada'] == 1,
+        'projeto_id': linha['projeto_id'],
+        'projeto_nome': linha['projeto_nome'],
+        'projeto_xp_acumulado': linha['projeto_xp_acumulado'],
+        'projeto_xp_meta': linha['projeto_xp_meta']
+      })
+
+      return participacoes
+
