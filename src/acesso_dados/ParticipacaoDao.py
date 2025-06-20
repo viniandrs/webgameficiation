@@ -2,6 +2,8 @@
 
 from .BaseDao import BaseDao
 from ..modelos.Participacao import Participacao
+from ..modelos.Dono import Dono
+from ..modelos.Participante import Participante
 
 class ParticipacaoDao(BaseDao):
   """
@@ -34,17 +36,25 @@ class ParticipacaoDao(BaseDao):
       linha_resultado (sqlite3.Row): Linha do resultado obtido no banco de dados
 
     Return:
-      Participacao: Instância da classe Participacao preenchida com os dados da consulta 
+      Participacao: Instância da classe Participacao (Dono ou Participante) preenchida com os dados da consulta 
+    
+    Raises:
+      ValueError: Se a classificação lida do banco de dados for desconhecida.
     """
+    usuario_id = linha_resultado['usuario_id']
+    projeto_id = linha_resultado['projeto_id']
+    participacao_id = linha_resultado['id']
+    classificacao = linha_resultado['classificacao']
+    xp_participacao = linha_resultado['xp_participacao']
+    ativa = True if linha_resultado['participacao_habilitada'] == 1 else False
 
-    return Participacao(
-      linha_resultado['usuario_id'],
-      linha_resultado['projeto_id'],
-      linha_resultado['id'],
-      linha_resultado['xp_participacao'],
-      True if linha_resultado['participacao_habilitada'] == 1 else False
-    )
-  
+    if classificacao == "DONO":
+      return Dono(usuario_id, projeto_id, participacao_id, xp_participacao, ativa)
+    elif classificacao == "PARTICIPANTE":
+      return Participante(usuario_id, projeto_id, participacao_id, xp_participacao, ativa)
+    else:
+      raise ValueError(f"Classificação {classificacao} desconhecida")
+
   def _converter_entidade_para_parametros_insercao(self, participacao: Participacao) -> tuple:
     """
     Converte uma instância de Participacao em uma tupla com os valores dos atributos na ordem correta
