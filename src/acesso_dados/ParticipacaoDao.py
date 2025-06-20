@@ -127,3 +127,26 @@ class ParticipacaoDao(BaseDao):
     WHERE id = ?
     """
     self._realizar_atualizacao(participacao, sql)
+  
+  def buscar_participacao_usuario_projeto(self, usuario_id: int, projeto_id: int) -> Participacao | None:
+    """
+    Busca uma participação específica de um usuário em um projeto.
+
+    Args:
+      usuario_id (int): O ID do usuário.
+      projeto_id (int): O ID do projeto.
+
+    Returns:
+      Participacao ou None: A instância da participação se encontrada, ou None.
+    """
+
+    sql = f"""
+    SELECT id, usuario_id, projeto_id, xp_participacao, participacao_habilitada, classificacao
+    FROM {self._obter_nome_tabela()}
+    WHERE usuario_id = ? AND projeto_id = ?;
+    """
+    resultado = self._obter_um(sql, (usuario_id, projeto_id))
+    
+    if resultado:
+      return self._converter_resultado_para_entidade(resultado)
+    return None
