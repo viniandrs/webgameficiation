@@ -133,8 +133,8 @@ class ParticipacaoDao(BaseDao):
     Busca uma participação específica de um usuário em um projeto.
 
     Args:
-      usuario_id (int): O ID do usuário.
-      projeto_id (int): O ID do projeto.
+      usuario_id (int): O identificador do usuário.
+      projeto_id (int): O identificador do projeto.
 
     Returns:
       Participacao ou None: A instância da participação se encontrada, ou None.
@@ -150,3 +150,18 @@ class ParticipacaoDao(BaseDao):
     if resultado:
       return self._converter_resultado_para_entidade(resultado)
     return None
+  
+  def inativa_participacao(self, participacao_id):
+    """
+    Altera o status de uma participação para inativa (participacao_habilitada = 0).
+    
+    Args:
+      participacao_id (int): O identificador da participação a ser inativada.
+    """
+
+    sql = f"""
+    UPDATE {self._obter_nome_tabela()}
+    SET participacao_habilitada = 0
+    WHERE id = ?;
+    """
+    self._executar_consulta(sql, (participacao_id,))
