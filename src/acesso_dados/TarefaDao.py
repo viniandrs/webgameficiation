@@ -2,6 +2,8 @@
 
 from .BaseDao import BaseDao
 from ..modelos.Tarefa import Tarefa
+from ..modelos.ItemDeTrabalho import StatusItem
+from datetime import date
 
 class TarefaDao(BaseDao):
   """
@@ -37,15 +39,23 @@ class TarefaDao(BaseDao):
       Tarefa: Instância da classe Tarefa preenchida com os dados da consulta 
     """
 
+    #Converte o status (string) obtido no bd para um membro da Enum StatusItem
+    status = StatusItem[linha_resultado['status']]
+    
+    #Converte string de data no bd para um objeto date
+    prazo = None
+    if linha_resultado['prazo']:
+      prazo = date.fromisoformat(linha_resultado['prazo'])
+
     return Tarefa(
       linha_resultado['id'],
       linha_resultado['projeto_id'],
       linha_resultado['titulo'],
       linha_resultado['descricao'],
       linha_resultado['xp_valor'],
-      linha_resultado['status'],
+      status,
       linha_resultado['participacao_responsavel_id'],
-      linha_resultado['prazo'],
+      prazo,
       linha_resultado['sprint_meta_id']
     )
   
@@ -62,14 +72,22 @@ class TarefaDao(BaseDao):
       tuple: Tupla com os valores dos atributos em ordem para a inserção
     """
 
+    #Converte o status de um membro da Enum StatusItem para uma string
+    status = tarefa.get_status().name
+
+    #Converte o prazo de um objeto date para uma string no formato ISO
+    prazo = None
+    if tarefa.get_prazo():
+      prazo = tarefa.get_prazo().isoformat()
+
     return (
       tarefa.get_projeto_id(),
       tarefa.get_nome(),
       tarefa.get_descricao(),
       tarefa.get_xp_valor(),
-      tarefa.get_status(),
+      status,
       tarefa.get_participacao_responsavel_id(),
-      tarefa.get_prazo(),
+      prazo,
       tarefa.get_sprint_meta_id(),
     )
   
@@ -85,13 +103,22 @@ class TarefaDao(BaseDao):
     Returns:
       tuple: Tupla com os valores dos atributos em ordem para a atualização
     """
+
+    #Converte o status de um membro da Enum StatusItem para uma string
+    status = tarefa.get_status().name
+
+    #Converte o prazo de um objeto date para uma string no formato ISO
+    prazo = None
+    if tarefa.get_prazo():
+      prazo = tarefa.get_prazo().isoformat()
+    
     return (
       tarefa.get_nome(),
       tarefa.get_descricao(),
       tarefa.get_xp_valor(),
-      tarefa.get_status(),
+      status,
       tarefa.get_participacao_responsavel_id(),
-      tarefa.get_prazo(),
+      prazo,
       tarefa.get_sprint_meta_id(),
       tarefa.get_id()
     )
