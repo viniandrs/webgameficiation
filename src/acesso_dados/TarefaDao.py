@@ -159,3 +159,20 @@ class TarefaDao(BaseDao):
     """
     self._realizar_atualizacao(tarefa, sql)
   
+  def atualizar_status_tarefa(self, tarefa_id: int, novo_status: StatusItem):
+    """
+    Atualiza o status de uma tarefa no banco de dados
+
+    Args:
+      tarefa_id (int): Identificador da tarefa a ser atualizada
+      novo_status (StatusItem): Novo status da tarefa
+    """
+    sql = f"""
+    UPDATE {self._obter_nome_tabela()}
+    SET status = ?
+    WHERE id = ?
+    """
+
+    status_str = novo_status.name
+    self._executar_consulta(sql, (status_str, tarefa_id))
+  
