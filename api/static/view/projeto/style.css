@@ -1,0 +1,28 @@
+
+.custom-circle-checkbox {
+  width: 24px;
+  height: 24px;
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: white;
+  border: 2px solid #000;
+  border-radius: 50%;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+}
+
+.custom-circle-checkbox:checked {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.custom-circle-checkbox:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.btn{
+  margin: 10px;
+}
