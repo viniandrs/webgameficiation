@@ -2,6 +2,8 @@
 
 from .BaseDao import BaseDao
 from ..modelos.Projeto import Projeto
+from ..modelos.ItemDeTrabalho import StatusItem
+from datetime import date
 
 class ProjetoDao(BaseDao):
   """
@@ -157,3 +159,33 @@ class ProjetoDao(BaseDao):
       })
     
     return membros
+
+  def buscar_tarefas_projeto(self, projeto_id: int):
+    """
+    Busca todas as tarefas associadas a um projeto
+
+    Args: 
+      projeto_id (int): Identificador do projeto usado na busca
+
+    Returns:
+      lista de dicionários: Lista contendo as informações de todas as tarefas associadas ao projeto no formato de dicionário 
+    """
+    sql = """
+    SELECT 
+    id, projeto_id, titulo, descricao, xp_valor, status, 
+    participacao_responsavel_id, prazo, sprint_meta_id
+    FROM tarefas
+    WHERE projeto_id = ?
+    """
+    resultados = self._obter_todos(sql, (projeto_id,))
+
+    tarefas = []
+    for linha in resultados:
+      temp = dict(linha)
+
+      temp['status'] = StatusItem[temp['status']]
+      temp['prazo'] = date.fromisoformat(temp['prazo'])
+      
+      tarefas.append(dict(linha))
+    
+    return tarefas
