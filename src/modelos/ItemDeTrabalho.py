@@ -47,7 +47,11 @@ class ItemDeTrabalho(ABC):
     
 
     #Setters:
-    
+
+    #setter de id do ItemDeTrabalho
+    def set_nome(self, id: int):
+        self.__id = id
+
     #setter de nome do ItemDeTrabalho
     def set_nome(self, nome: str):
         self.__nome = nome
