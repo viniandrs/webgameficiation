@@ -4,8 +4,8 @@ from Tarefa import Tarefa
 class Dono(Participacao):
 
     #Construtor da classe Dono
-    def __init__(self, id: int, usuario_id: int, projeto_id: int):
-        super().__init__(id, usuario_id, projeto_id)
+    def __init__(self, usuario_id: int, projeto_id: int, id: int | None = None, xp_participacao: int = 0, ativa: bool = True):
+        super().__init__(usuario_id, projeto_id, id, xp_participacao, ativa)
     
     #Implementações concretas dos metodos abstratos de Participacao:
 

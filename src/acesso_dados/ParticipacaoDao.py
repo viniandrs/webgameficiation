@@ -2,6 +2,8 @@
 
 from .BaseDao import BaseDao
 from ..modelos.Participacao import Participacao
+from ..modelos.Dono import Dono
+from ..modelos.Participante import Participante
 
 class ParticipacaoDao(BaseDao):
   """
@@ -34,17 +36,25 @@ class ParticipacaoDao(BaseDao):
       linha_resultado (sqlite3.Row): Linha do resultado obtido no banco de dados
 
     Return:
-      Participacao: Instância da classe Participacao preenchida com os dados da consulta 
+      Participacao: Instância da classe Participacao (Dono ou Participante) preenchida com os dados da consulta 
+    
+    Raises:
+      ValueError: Se a classificação lida do banco de dados for desconhecida.
     """
+    usuario_id = linha_resultado['usuario_id']
+    projeto_id = linha_resultado['projeto_id']
+    participacao_id = linha_resultado['id']
+    classificacao = linha_resultado['classificacao']
+    xp_participacao = linha_resultado['xp_participacao']
+    ativa = True if linha_resultado['participacao_habilitada'] == 1 else False
 
-    return Participacao(
-      linha_resultado['usuario_id'],
-      linha_resultado['projeto_id'],
-      linha_resultado['id'],
-      linha_resultado['xp_participacao'],
-      True if linha_resultado['participacao_habilitada'] == 1 else False
-    )
-  
+    if classificacao == "DONO":
+      return Dono(usuario_id, projeto_id, participacao_id, xp_participacao, ativa)
+    elif classificacao == "PARTICIPANTE":
+      return Participante(usuario_id, projeto_id, participacao_id, xp_participacao, ativa)
+    else:
+      raise ValueError(f"Classificação {classificacao} desconhecida")
+
   def _converter_entidade_para_parametros_insercao(self, participacao: Participacao) -> tuple:
     """
     Converte uma instância de Participacao em uma tupla com os valores dos atributos na ordem correta
@@ -117,3 +127,41 @@ class ParticipacaoDao(BaseDao):
     WHERE id = ?
     """
     self._realizar_atualizacao(participacao, sql)
+  
+  def buscar_participacao_usuario_projeto(self, usuario_id: int, projeto_id: int) -> Participacao | None:
+    """
+    Busca uma participação específica de um usuário em um projeto.
+
+    Args:
+      usuario_id (int): O identificador do usuário.
+      projeto_id (int): O identificador do projeto.
+
+    Returns:
+      Participacao ou None: A instância da participação se encontrada, ou None.
+    """
+
+    sql = f"""
+    SELECT id, usuario_id, projeto_id, xp_participacao, participacao_habilitada, classificacao
+    FROM {self._obter_nome_tabela()}
+    WHERE usuario_id = ? AND projeto_id = ?;
+    """
+    resultado = self._obter_um(sql, (usuario_id, projeto_id))
+    
+    if resultado:
+      return self._converter_resultado_para_entidade(resultado)
+    return None
+  
+  def inativa_participacao(self, participacao_id):
+    """
+    Altera o status de uma participação para inativa (participacao_habilitada = 0).
+    
+    Args:
+      participacao_id (int): O identificador da participação a ser inativada.
+    """
+
+    sql = f"""
+    UPDATE {self._obter_nome_tabela()}
+    SET participacao_habilitada = 0
+    WHERE id = ?;
+    """
+    self._executar_consulta(sql, (participacao_id,))

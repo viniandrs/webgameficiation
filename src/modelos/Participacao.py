@@ -2,10 +2,10 @@ from abc import ABC, abstractmethod
 from IGerenciadorXP import IGerenciadorXP
 from .Tarefa import Tarefa
 
-class Participacao(IGerenciadorXP):
+class Participacao(ABC, IGerenciadorXP):
 
     #Construtor da classe Participacao
-    def __init__(self, usuario_id: int, projeto_id: int, id: int | None = None, xp_participacao: int = 0, ativa: bool = True):
+    def __init__(self, usuario_id: int, projeto_id: int, id: int | None, xp_participacao: int, ativa: bool):
         self.__id = id
         self.__usuario_id = usuario_id
         self.__projeto_id = projeto_id
@@ -16,7 +16,7 @@ class Participacao(IGerenciadorXP):
     #Getters:
 
     #getter de id da Participacao
-    def get_id(self) -> int:
+    def get_id(self) -> int | None:
         return self.__id
     
     #getter de uduario_id da Participacao
@@ -33,6 +33,10 @@ class Participacao(IGerenciadorXP):
     
 
     #Setters:
+
+    #setter de id, altera id da Participacao
+    def set_id(self, novo_id: int):
+        self.__id = novo_id
 
     #Altera o status de ativa da Participacao
     def set_ativa(self, ativa: bool):
@@ -51,7 +55,7 @@ class Participacao(IGerenciadorXP):
         if valor > 0:
             self.__xp_participacao = max(0, self.__xp_participacao - valor)
 
-    #getter de xp_participacao da Participacao
+    #obtem o xp vinculado a Participacao
     def get_xp(self):
         return self.__xp_participacao
     
@@ -60,20 +64,33 @@ class Participacao(IGerenciadorXP):
 
     @abstractmethod
     def get_classificacao(self) -> str:
+        """Retorna a classificação da Participacao"""
         pass
 
     @abstractmethod
     def pode_criar_tarefa(self) -> bool:
+        """Verifica se a Participacao pode criar tarefas"""
         pass
 
     @abstractmethod
     def pode_adicionar_membro(self) -> bool:
+        """Verifica se a Participacao pode adicionar membros"""        
         pass
 
     @abstractmethod
     def pode_remover_membro(self) -> bool:
+        """Verifica se a Participacao pode remover membros"""  
         pass
 
     @abstractmethod
-    def pode_atualizar_status(self, tarefa: 'Tarefa') -> bool:
+    def pode_atualizar_status(self, tarefa: Tarefa) -> bool:
+        """
+        Verifica se a Participacao pode atualizar o status de uma tarefa
+        
+        Args:
+            tarefa (Tarefa): Instância de Tarefa para qual está sendo verificada a permissão
+
+        Returns:
+            bool: True se possui permissão, False caso contrário
+        """  
         pass

@@ -2,6 +2,8 @@
 
 from .BaseDao import BaseDao
 from ..modelos.Projeto import Projeto
+from ..modelos.ItemDeTrabalho import StatusItem
+from datetime import date
 
 class ProjetoDao(BaseDao):
   """
@@ -83,6 +85,8 @@ class ProjetoDao(BaseDao):
       projeto.get_id()
     )
   
+  #Métodos públicos
+  
   def inserir(self, projeto: Projeto):
     """
     Insere um novo projeto no banco de dados
@@ -117,3 +121,41 @@ class ProjetoDao(BaseDao):
     WHERE id = ?
     """
     self._realizar_atualizacao(projeto, sql)
+  
+  def buscar_membros_do_projeto(self, projeto_id: int):
+    """
+    Encontra todos os usuários com participação ativa em um projeto
+
+    Args: 
+      projeto_id (int): Identificados do projeto usado na busca
+
+    Returns:
+      lista de dict: Lista de dicionários com os dados do usuário e da sua participação no projeto,
+      ordenados com base no xp_participacao 
+    """
+    sql = f"""
+    SELECT 
+    user.id AS usuario_id, 
+    user.nome AS usuario_nome, 
+    part.xp_participacao, 
+    part.classificacao, 
+    part.participacao_habilitada
+    FROM usuarios AS user
+    JOIN participacoes AS part ON user.id = part.usuario_id
+    WHERE part.projeto_id = ? AND part.participacao_habilitada = 1
+    ORDER BY part.xp_participacao DESC;
+    """
+    resultado = self._obter_todos(sql, (projeto_id, ))
+    
+    membros = []
+
+    for membro in resultado:
+      membros.append({
+        'usuario_id': membro['usuario_id'],
+        'usuario_nome': membro['usuario_nome'],
+        'classificacao': membro['classificacao'],
+        'xp_participacao': membro['xp_participacao'],
+        'participacao_habilitada': membro['participacao_habilitada']
+      })
+    
+    return membros

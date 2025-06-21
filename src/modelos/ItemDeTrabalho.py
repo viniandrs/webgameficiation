@@ -10,7 +10,7 @@ class StatusItem(Enum):
 class ItemDeTrabalho(ABC):
 
     #construtor da classe ItemDeTrabalho
-    def __init__(self, id: int, projeto_id: int, nome: str, descricao: str, xp_valor: int, status: StatusItem):
+    def __init__(self, id: int | None, projeto_id: int, nome: str, descricao: str, xp_valor: int, status: StatusItem):
         self.__id = id
         self.__projeto_id = projeto_id
         self.__nome = nome
@@ -47,7 +47,11 @@ class ItemDeTrabalho(ABC):
     
 
     #Setters:
-    
+
+    #setter de id do ItemDeTrabalho
+    def set_nome(self, id: int):
+        self.__id = id
+
     #setter de nome do ItemDeTrabalho
     def set_nome(self, nome: str):
         self.__nome = nome
