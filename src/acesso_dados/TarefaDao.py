@@ -176,3 +176,42 @@ class TarefaDao(BaseDao):
     status_str = novo_status.name
     self._executar_consulta(sql, (status_str, tarefa_id))
   
+  def buscar_tarefas_projeto(self, projeto_id):
+    """
+    Busca todas as tarefas associadas a um projeto
+
+    Args: 
+      projeto_id (int): Identificador do projeto usado na busca
+
+    Returns:
+      lista de Tarefas: Lista contendo todas as tarefas associadas ao projeto 
+    """
+    sql = """
+    SELECT 
+    id, projeto_id, titulo, descricao, xp_valor, status, 
+    participacao_responsavel_id, prazo, sprint_meta_id
+    FROM tarefas
+    WHERE projeto_id = ?
+    """
+    resultados = self._obter_todos(sql, (projeto_id,))
+    return [self._converter_resultado_para_entidade(linha) for linha in resultados]
+  
+  def buscar_tarefas_sprint(self, sprint_id):
+    """
+    Busca todas as tarefas associadas a uma sprint
+
+    Args: 
+      sprint_id (int): Identificador da sprint usado na busca
+
+    Returns:
+      lista de Tarefas: Lista contendo todas as tarefas associadas a sprint
+    """
+    sql = """
+    SELECT 
+    id, projeto_id, titulo, descricao, xp_valor, status, 
+    participacao_responsavel_id, prazo, sprint_meta_id
+    FROM tarefas
+    WHERE sprint_meta_id = ?
+    """
+    resultados = self._obter_todos(sql, (sprint_id,))
+    return [self._converter_resultado_para_entidade(linha) for linha in resultados]
