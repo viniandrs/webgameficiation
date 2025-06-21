@@ -5,7 +5,7 @@ Módulo responsável pela configuração inicial do banco de dados, incluindo a 
 """
 
 import sqlite3
-from .utils import obter_conexao
+from models.utils import obter_conexao
 
 # Tabela com as strings SQL para a criação das tabelas
 sql_tabelas = [

@@ -6,6 +6,12 @@ sys.path.append(os.path.join(os.getcwd()))  # add src to PYTHONPATH
 from datetime import date
 from flask import Flask, jsonify, send_from_directory, session, render_template, request
 
+from models.modelos.Projeto import Projeto
+from models.modelos.Tarefa import Tarefa
+from models.modelos.SprintMeta import SprintMeta
+from models.modelos.Dono import Dono
+from models.modelos.Participante import Participante
+
 from models.acesso_dados.UsuarioDao import UsuarioDao
 from models.acesso_dados.ProjetoDao import ProjetoDao
 from models.acesso_dados.ParticipacaoDao import ParticipacaoDao
@@ -57,12 +63,19 @@ app.secret_key = "supersecreto"
 #     Tarefa(4, 4, "Consulta Saldo", "Implementar saldo", 40, "pendente", date(2025, 6, 30), 4, 4)
 # ]
 
+# instantiating DAOs
+usuariosDAO = UsuarioDao() 
+projetosDAO = ProjetoDao()
+participacoesDAO = ParticipacaoDao()
+tarefasDAO = TarefaDao()
+sprint_metasDAO = SprintMetaDao()
+
 # querying initial data from database
-usuarios = UsuarioDao.listar_todos()
-projetos = ProjetoDao.listar_todos()
-participacoes = ParticipacaoDao.listar_todos()
-sprint_metas = SprintMetaDao.listar_todos()
-tarefas = TarefaDao.listar_todos()
+usuarios = usuariosDAO.listar_todos()
+projetos = projetosDAO.listar_todos()
+participacoes = participacoesDAO.listar_todos()
+tarefas = tarefasDAO.listar_todos()
+sprint_metas = sprint_metasDAO.listar_todos()
 
 contador_id_tarefas = 5
 contador_id_sprints = 5
@@ -374,7 +387,7 @@ def api_criar_projeto():
     id_usuario = session.get("usuario_id")
 
     participante_criador = Dono(
-        contador_id_participante, id_usuario, contador_id_projetos, 0, True, "DONO"
+        id_usuario, contador_id_projetos, 0, 0, True
     )
 
     contador_id_projetos += 1

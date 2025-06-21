@@ -6,7 +6,7 @@ from unittest.mock import patch
 from models.modelos.Usuario import Usuario
 from models.acesso_dados.UsuarioDao import UsuarioDao
 from models.utils import obter_conexao_teste
-from models.configuracao_banco_dados import (
+from configuracao_banco_dados import (
     criar_tabelas_em_conexao,
     apagar_tabelas_em_conexao,
 )

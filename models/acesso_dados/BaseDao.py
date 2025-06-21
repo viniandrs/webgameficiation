@@ -96,7 +96,7 @@ class BaseDao(ABC):
           cursor.execute(sql)
         return cursor.fetchall()
     except sqlite3.Error as e:
-      print(f"Erro ao obter resultado SQL: {sql}\n. Erro: {e}")
+      print(f"Erro ao obter resultado SQL: {sql}\nErro: {e}")
       raise
 
   # Métodos abstratos
