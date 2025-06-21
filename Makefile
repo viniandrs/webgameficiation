@@ -7,9 +7,9 @@ test:
 	python tests/test_usuario_modelo.py
 
 format:
-	black *.py
+	find . -type f -name "*.py" -not -path "*/.venv/*" -exec black {} +
 
 lint:
-	pylint --disable=R,C main.py hello.py
+	pylint --disable=R,C api/App.py
 
 all: install lint format test

@@ -2,7 +2,7 @@
 
 import sqlite3
 from abc import ABC, abstractmethod
-from ..utilidades_banco_dados import obter_conexao
+from ..utils import obter_conexao
 
 class BaseDao(ABC):
   """

@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from datetime import date
 
+
 # ==== Usuário ====
 class Usuario:
     def __init__(self, id, nome, email, senha):
@@ -8,6 +9,7 @@ class Usuario:
         self.nome = nome
         self.email = email
         self.senha = senha
+
 
 # ==== Projeto ====
 class Projeto:
@@ -19,20 +21,33 @@ class Projeto:
         self.xp_meta = xp_meta
         self.sprints = []
 
+
 # ==== Interface IGerenciadorXP ====
 class IGerenciadorXP(ABC):
     @abstractmethod
-    def adicionar_xp(self, valor): pass
+    def adicionar_xp(self, valor):
+        pass
 
     @abstractmethod
-    def remover_xp(self, valor): pass
+    def remover_xp(self, valor):
+        pass
 
     @abstractmethod
-    def obter_xp(self): pass
+    def obter_xp(self):
+        pass
+
 
 # ==== Participacao ====
 class Participacao(IGerenciadorXP):
-    def __init__(self, id, usuario_id, projeto_id, xp_participacao, participacao_habilitada, classificacao):
+    def __init__(
+        self,
+        id,
+        usuario_id,
+        projeto_id,
+        xp_participacao,
+        participacao_habilitada,
+        classificacao,
+    ):
         self.id = id
         self.usuario_id = usuario_id
         self.projeto_id = projeto_id
@@ -44,7 +59,7 @@ class Participacao(IGerenciadorXP):
         return self.classificacao
 
     def pode_atualizar_status_tarefa(self):
-        return self.classificacao == 'DONO'
+        return self.classificacao == "DONO"
 
     def adicionar_xp(self, valor):
         self.xp_participacao += valor
@@ -55,15 +70,18 @@ class Participacao(IGerenciadorXP):
     def obter_xp(self):
         return self.xp_participacao
 
+
 class Dono(Participacao):
     def __init__(self, *args):
         super().__init__(*args)
-        self.classificacao = 'DONO'
+        self.classificacao = "DONO"
+
 
 class Participante(Participacao):
     def __init__(self, *args):
         super().__init__(*args)
-        self.classificacao = 'PARTICIPANTE'
+        self.classificacao = "PARTICIPANTE"
+
 
 # ==== ItemDeTrabalho ====
 class ItemDeTrabalho(ABC):
@@ -78,15 +96,28 @@ class ItemDeTrabalho(ABC):
     def get_status(self):
         return self.status
 
+
 # ==== SprintMeta ====
 class SprintMeta(ItemDeTrabalho):
     def __init__(self, id, projeto_id, nome, descricao, xp_valor, status, data_alvo):
         super().__init__(id, projeto_id, nome, descricao, xp_valor, status)
         self.data_alvo = data_alvo
 
+
 # ==== Tarefa ====
 class Tarefa(ItemDeTrabalho):
-    def __init__(self, id, projeto_id, nome, descricao, xp_valor, status, prazo, participacao_responsavel_id, sprint_meta_id):
+    def __init__(
+        self,
+        id,
+        projeto_id,
+        nome,
+        descricao,
+        xp_valor,
+        status,
+        prazo,
+        participacao_responsavel_id,
+        sprint_meta_id,
+    ):
         super().__init__(id, projeto_id, nome, descricao, xp_valor, status)
         self.prazo = prazo
         self.participacao_responsavel_id = participacao_responsavel_id

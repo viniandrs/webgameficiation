@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 
+
 class IGerenciadorXP(ABC):
 
-    #Métodos abstratos para gerenciamento de XP:
+    # Métodos abstratos para gerenciamento de XP:
 
     @abstractmethod
     def adicionar_xp(self, valor: int):

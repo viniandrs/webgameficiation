@@ -1,15 +1,15 @@
-#src/configuracao_banco_dados.py
+# src/configuracao_banco_dados.py
 
 """
 Módulo responsável pela configuração inicial do banco de dados, incluindo a criação de tabelas
 """
 
 import sqlite3
-from .utilidades_banco_dados import obter_conexao
+from .utils import obter_conexao
 
 # Tabela com as strings SQL para a criação das tabelas
 sql_tabelas = [
-  """
+    """
   CREATE TABLE IF NOT EXISTS usuarios (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nome TEXT NOT NULL,
@@ -17,7 +17,7 @@ sql_tabelas = [
     senha TEXT NOT NULL
   );
   """,
-  """
+    """
   CREATE TABLE IF NOT EXISTS projetos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nome TEXT NOT NULL,
@@ -26,7 +26,7 @@ sql_tabelas = [
     xp_meta INT NOT NULL DEFAULT 0
   );
   """,
-  """
+    """
   CREATE TABLE IF NOT EXISTS participacoes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     usuario_id INTEGER NOT NULL,
@@ -39,7 +39,7 @@ sql_tabelas = [
     FOREIGN KEY (projeto_id) REFERENCES projetos(id) ON DELETE CASCADE ON UPDATE CASCADE
   );
   """,
-  """
+    """
   CREATE TABLE IF NOT EXISTS tarefas (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     projeto_id INTEGER NOT NULL,
@@ -55,7 +55,7 @@ sql_tabelas = [
     FOREIGN KEY (sprint_meta_id) REFERENCES sprint_metas(id) ON DELETE SET NULL ON UPDATE CASCADE
   );
   """,
-  """
+    """
   CREATE TABLE IF NOT EXISTS sprint_metas (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     projeto_id INTEGER NOT NULL,
@@ -66,26 +66,29 @@ sql_tabelas = [
     data_alvo TEXT, -- Formato ISO 8601 YYYY-MM-DD HH:MM:SS
     FOREIGN KEY (projeto_id) REFERENCES projetos(id) ON DELETE CASCADE ON UPDATE CASCADE
   );
-  """
+  """,
 ]
 
+
 def criar_tabelas():
-  """
-  Cria as tabelas necessárias no banco de dados SQLite
-  """
-  try:
-    with obter_conexao() as conexao:
-      cursor = conexao.cursor()
-      for sql in sql_tabelas:
-        cursor.execute(sql)
-      print("Tabelas criadas com sucesso")
-  except sqlite3.Error as e:
-    print(f"Erro ao criar tabelas: {e}")
+    """
+    Cria as tabelas necessárias no banco de dados SQLite
+    """
+    try:
+        with obter_conexao() as conexao:
+            cursor = conexao.cursor()
+            for sql in sql_tabelas:
+                cursor.execute(sql)
+            print("Tabelas criadas com sucesso")
+    except sqlite3.Error as e:
+        print(f"Erro ao criar tabelas: {e}")
+
 
 def criar_tabelas_em_conexao(conexao):
-  cursor = conexao.cursor()
-  for sql in sql_tabelas:
-    cursor.execute(sql)
+    cursor = conexao.cursor()
+    for sql in sql_tabelas:
+        cursor.execute(sql)
+
 
 def apagar_tabelas_em_conexao(conexao):
     cursor = conexao.cursor()
@@ -95,12 +98,13 @@ def apagar_tabelas_em_conexao(conexao):
         "DROP TABLE IF EXISTS tarefas;",
         "DROP TABLE IF EXISTS participacoes;",
         "DROP TABLE IF EXISTS projetos;",
-        "DROP TABLE IF EXISTS usuarios;"
+        "DROP TABLE IF EXISTS usuarios;",
     ]
     for sql in sql_drop_tabelas:
         cursor.execute(sql)
 
-#Teste de sanidade para a criação de tabelas
+
+# Teste de sanidade para a criação de tabelas
 if __name__ == "__main__":
     print("Executando teste de criação de tabelas")
     try:
@@ -110,5 +114,3 @@ if __name__ == "__main__":
         print(f"Erro no teste de criação de tabelas: {e}")
     except Exception as e:
         print(f"Ocorreu um erro inesperado durante a criação das tabelas: {e}")
-
-

@@ -11,7 +11,7 @@ usuario = Usuario(1, "João", "joao@email.com", "minhaSenha123")
 
 # Verificando login
 print(usuario.verificar_senha("minhaSenha123"))  # ✅ True
-print(usuario.verificar_senha("senhaErrada"))    # ❌ False
+print(usuario.verificar_senha("senhaErrada"))  # ❌ False
 
 # Tentando alterar senha com a senha errada
 print(usuario.alterar_senha("errada", "novaSenha123"))  # ❌ False
@@ -27,7 +27,7 @@ projeto = Projeto(
     id=1,
     nome="Sistema Gamificado MC322",
     descricao="Projeto final da disciplina para aplicar POO com gamificação.",
-    xp_meta=1000
+    xp_meta=1000,
 )
 
 # Imprime o estado inicial do projeto
@@ -52,7 +52,6 @@ print("\nApós adicionar muito XP:")
 print(projeto)
 
 
-
 dono = Dono(id=1, usuario_id=10, projeto_id=100)
 
 print("\nClassificação:", dono.get_classificacao())
@@ -72,5 +71,3 @@ print("Pode atualizar status?", p.pode_atualizar_status())
 
 p.adicionar_xp(50)
 print("XP:", p.get_xp())
-
-
