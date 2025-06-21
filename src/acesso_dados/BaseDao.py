@@ -205,6 +205,19 @@ class BaseDao(ABC):
       return self._converter_resultado_para_entidade(resultado_consulta)
     return None
   
+  def listar_todos(self):
+    """
+    Busca uma lista de todas as entidades da tabela correspondente
+
+    Returns:
+      Lista de objetos: Lista contendo todos os objetos da entidade correspondente
+    """
+
+    sql = f"SELECT * FROM {self._obter_nome_tabela()}"
+    resultados = self._obter_todos(sql)
+    return [self._converter_resultado_para_entidade(linha) for linha in resultados]
+  
+  
   def remover(self, id_entidade):
     """
     Remove uma entidade do banco de dados pelo id
