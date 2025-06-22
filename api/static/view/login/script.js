@@ -1,26 +1,31 @@
-async function loadUsers() {
-  try {
-    const res = await fetch('/api/usuarios');
-    if (!res.ok) throw new Error('Erro ao carregar usuários');
-    const users = await res.json();
+function initPage(params) {
+  const form = document.getElementById('login');
 
-    const listDiv = document.getElementById('user-list');
-    listDiv.innerHTML = '';
-    users.forEach(user => {
-      const btn = document.createElement('button');
-      btn.textContent = user.nome;
-      btn.className = 'btn btn-primary';
-      btn.addEventListener('click', async () => {
-        await fetch('/api/login/'+user.id, {
-          method: 'POST'
-        });
-        loadPage('home');
-      });
-      listDiv.appendChild(btn);
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const body = Object.fromEntries(formData.entries());
+
+    const response = await fetch('/api/usuario/verifica-senha', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
     });
-  } catch (err) {
-    document.getElementById('user-list').innerHTML = `<p class="text-danger">${err.message}</p>`;
-  }
+
+    const data = await response.json();
+
+    if (response.ok && data.ok) {
+      await fetch('/api/login/' + data.usuario_id, {
+        method: 'POST'
+      });
+      loadPage('home');
+    } else {
+      alert('Email ou Senha Incorretos');
+    }
+  })
+
 }
 
-loadUsers();
+function criarUsuario(){
+  loadPage("cadastroUsuario")
+}

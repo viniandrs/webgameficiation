@@ -1,2 +1,17 @@
-<h1 class="mb-4">Escolha um usuário</h1>
-<div id="user-list" class="d-grid gap-2"></div>
+<div class="container mt-4 row justify-content-center">
+  <h2>Logar</h2>
+<form id="login">
+  <div class="mb-3">
+    <label for="email" class="form-label">Email</label>
+    <input type="email" class="form-control" id="email" name="email"></textarea>
+  </div>
+
+  <div class="mb-3">
+    <label for="senha" class="form-label">Senha</label>
+    <input type="password" class="form-control" id="senha" name="senha">
+  </div>
+
+  <button type="submit" id="entrar" class="btn btn-primary">Entrar</button>
+</form>
+<button class="btn btn-secondary col-2" onclick="criarUsuario()">Criar Usuario</button>
+</div>

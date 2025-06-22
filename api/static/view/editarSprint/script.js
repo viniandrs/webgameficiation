@@ -5,6 +5,7 @@ function initPage(params) {
   fetch(`/api/sprint/${sprint_id}`)
     .then(res => res.json())
     .then(sprint => {
+      console.log(sprint)
       document.getElementById('nome').value = sprint.nome;
       document.getElementById('descricao').value = sprint.descricao;
       document.getElementById('data_alvo').value = sprint.data_alvo;

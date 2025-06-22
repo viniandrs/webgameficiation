@@ -56,7 +56,7 @@ class Tarefa(ItemDeTrabalho):
 
     # retorna dados sobre a tarefa em formato de string
     def __str__(self):
-        return f"Tarefa '{self.get_nome()}':\nStatus: {self.get_status().name}\nXP: {self.get_xp_valor()}\nPrazo: {self.__prazo}"
+        return f"Tarefa '{self.get_nome()}':\nStatus: {self.get_status().name}\nXP: {self.get_xp_valor()}\nPrazo: {self.get_prazo()}"
 
     # Implementação dos métodos abstratos de ItemDeTrabalho:
 

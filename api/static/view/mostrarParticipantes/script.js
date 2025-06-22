@@ -9,15 +9,16 @@ function initPage(params) {
 }
 
 function exibirParticipantes(participantes) {
+  console.log(participantes)
   const tbody = document.getElementById('tabela-participantes');
   tbody.innerHTML = '';
 
   participantes.forEach(p => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${p.id}</td>
-      <td>${p.nome}</td>
-      <td>${p.xp_contribuido}</td>
+      <td>${p.usuario_id}</td>
+      <td>${p.usuario_nome}</td>
+      <td>${p.xp_participacao}</td>
       <td>
         <select class="form-select form-select-sm" data-id="${p.id}">
           <option value="DONO" ${p.classificacao==='DONO'?'selected':''}>DONO</option>
@@ -25,7 +26,7 @@ function exibirParticipantes(participantes) {
         </select>
       </td>
       <td>
-        <input type="checkbox" data-id="${p.id}" class="form-check-input" ${p.habilitado?'checked':''}>
+        <input type="checkbox" data-id="${p.usuario_id}" class="form-check-input" ${p.participacao_habilitada?'checked':''}>
       </td>
     `;
     tbody.append(tr);

@@ -3,7 +3,7 @@
 from .BaseDao import BaseDao
 from ..modelos.Tarefa import Tarefa
 from ..modelos.ItemDeTrabalho import StatusItem
-from datetime import date
+from datetime import date, datetime
 
 class TarefaDao(BaseDao):
   """
@@ -45,18 +45,18 @@ class TarefaDao(BaseDao):
     #Converte string de data no bd para um objeto date
     prazo = None
     if linha_resultado['prazo']:
-      prazo = date.fromisoformat(linha_resultado['prazo'])
+      prazo = datetime.strptime(linha_resultado['prazo'], '%Y-%m-%dT%H:%M:%S').date()
 
     return Tarefa(
-      linha_resultado['id'],
-      linha_resultado['projeto_id'],
-      linha_resultado['titulo'],
-      linha_resultado['descricao'],
-      linha_resultado['xp_valor'],
-      status,
-      linha_resultado['participacao_responsavel_id'],
-      prazo,
-      linha_resultado['sprint_meta_id']
+      id =linha_resultado['id'],
+      projeto_id=linha_resultado['projeto_id'],
+      nome= linha_resultado['titulo'],
+      descricao=linha_resultado['descricao'],
+      xp_valor=linha_resultado['xp_valor'],
+      status=status,
+      participacao_responsavel_id=linha_resultado['participacao_responsavel_id'],
+      prazo=prazo,
+      sprint_meta_id=linha_resultado['sprint_meta_id']
     )
   
   def _converter_entidade_para_parametros_insercao(self, tarefa: Tarefa) -> tuple:
@@ -78,8 +78,7 @@ class TarefaDao(BaseDao):
     #Converte o prazo de um objeto date para uma string no formato ISO
     prazo = None
     if tarefa.get_prazo():
-      prazo = tarefa.get_prazo().isoformat()
-
+      prazo = datetime.fromisoformat(tarefa.get_prazo()).isoformat()
     return (
       tarefa.get_projeto_id(),
       tarefa.get_nome(),
@@ -110,7 +109,7 @@ class TarefaDao(BaseDao):
     #Converte o prazo de um objeto date para uma string no formato ISO
     prazo = None
     if tarefa.get_prazo():
-      prazo = tarefa.get_prazo().isoformat()
+      prazo = datetime.fromisoformat(tarefa.get_prazo()).isoformat()
     
     return (
       tarefa.get_nome(),

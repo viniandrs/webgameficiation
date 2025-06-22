@@ -3,7 +3,7 @@
 from .BaseDao import BaseDao
 from ..modelos.SprintMeta import SprintMeta
 from ..modelos.ItemDeTrabalho import StatusItem
-from datetime import date
+from datetime import date, datetime
 
 class SprintMetaDao(BaseDao):
   """
@@ -45,7 +45,7 @@ class SprintMetaDao(BaseDao):
     #Converte string de data no bd para um objeto date
     prazo = None
     if linha_resultado['data_alvo']:
-      prazo = date.fromisoformat(linha_resultado['data_alvo'])
+      prazo = datetime.strptime(linha_resultado['data_alvo'], '%Y-%m-%dT%H:%M:%S').date()
 
     return SprintMeta(
       linha_resultado['id'],
@@ -71,12 +71,12 @@ class SprintMetaDao(BaseDao):
 
     #Converte o status de um membro da Enum StatusItem para uma string
     status = sprint.get_status().name
-
     #Converte o prazo de um objeto date para uma string no formato ISO
     prazo = None
     if sprint.get_data_alvo():
-      prazo = sprint.get_data_alvo().isoformat()
+      prazo = datetime.fromisoformat(sprint.get_data_alvo()).isoformat()
 
+    
     return (
       sprint.get_projeto_id(),
       sprint.get_nome(),
@@ -104,7 +104,7 @@ class SprintMetaDao(BaseDao):
     #Converte o prazo de um objeto date para uma string no formato ISO
     prazo = None
     if sprint.get_data_alvo():
-      prazo = sprint.get_data_alvo().isoformat()
+      prazo = datetime.fromisoformat(sprint.get_data_alvo()).isoformat()
     
     return (
       sprint.get_nome(),
@@ -132,7 +132,7 @@ class SprintMetaDao(BaseDao):
     """
     sql = f"""
     INSERT INTO {self._obter_nome_tabela()} 
-    (projeto_id, titulo, descricao, xp_bonus, status, data_alvo)
+    (projeto_id, nome, descricao, xp_bonus, status, data_alvo)
     Values (?, ?, ?, ?, ?, ?);
     """
     return self._realizar_insercao_e_atribuir_id(sprint, sql)
@@ -146,7 +146,7 @@ class SprintMetaDao(BaseDao):
     """
     sql = f"""
     UPDATE {self._obter_nome_tabela()}
-    SET titulo = ?, descricao = ?, xp_bonus = ?, status = ?, data_alvo = ?
+    SET nome = ?, descricao = ?, xp_bonus = ?, status = ?, data_alvo = ?
     WHERE id = ?
     """
     self._realizar_atualizacao(sprint, sql)

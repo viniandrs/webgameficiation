@@ -9,6 +9,8 @@ function initPage(params) {
 async function renderProjeto(projeto) {
   const res = await fetch('/api/participante/' + projeto.id);
   const participante = await res.json();
+
+  console.log(participante)
   
   const content = document.getElementById('content');
   content.innerHTML = `
@@ -20,7 +22,7 @@ async function renderProjeto(projeto) {
       ${participante.classificacao=="DONO" ? `<button class="btn btn-sm btn-outline-info ms-2" onclick="handleParticipantes(${projeto.id})">Gerenciar Participantes</button>` : ''}
 
       <p id="classificacao_usuario">Classificação: ${participante.classificacao}</p>
-      <p id="classificacao_usuario">Contribuição: ${participante.xp_participacao}xp</p>
+      <p id="classificacao_usuario">Contribuição: ${participante.xp}xp</p>
       <button class="btn btn-sm btn-outline-info ms-2" onclick="handleRanking(${projeto.id})">Gerar ranking Contribuicoes</button>
 
       <div class="my-4">
@@ -162,11 +164,11 @@ function createListenerSelect(accordion, item, id_projeto){
       const select = accordion.querySelector(`[data-tarefa-id="${item.id}"]`);
       select.innerHTML = '';
       participantes.forEach(p => {
-        if(p.habilitado){
+        if(p.participacao_habilitada){
           const option = document.createElement('option');
-          option.value = p.id;
-          option.textContent = p.nome;
-          if (p.id == item.participacao_responsavel_id) option.selected = true;
+          option.value = p.usuario_id;
+          option.textContent = p.usuario_nome;
+          if (p.usuario_id == item.participacao_responsavel_id) option.selected = true;
           select.appendChild(option);     
         }
       });
@@ -316,7 +318,7 @@ function handleRanking(projeto_id){
       let contador = 1
       
       participantes.forEach(participante =>{
-        texto_dados += `<p>${contador}: ${participante.nome} - ${participante.xp_contribuido}xp`
+        texto_dados += `<p>${contador}: ${participante.usuario_nome} - ${participante.xp_participacao}xp`
         contador++
       })
 

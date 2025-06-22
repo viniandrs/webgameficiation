@@ -159,3 +159,28 @@ class ProjetoDao(BaseDao):
       })
     
     return membros
+  
+  def buscar_por_usuario_id(self, usuario_id:int):
+    """
+    Busca uma entidade no banco de dados pelo id do usuário que possui vinculo
+
+    Args:
+      usuario_id: o identificador do usuario que tera relação com o projeto
+    
+    Returns:
+      objeto ou None: Objeto da entidade correspondente ou None caso não seja encontrado
+    
+    Raises:
+      sqlite3.Error: Se ocorrer algum erro durante a execução da consulta
+    """
+    sql = """
+    SELECT projetos.*
+    FROM projetos
+    JOIN participacoes ON projetos.id = participacoes.projeto_id
+    WHERE participacoes.usuario_id = ?;
+    """
+    resultado_consulta = self._obter_todos(sql, (usuario_id,))
+
+    if resultado_consulta:
+       return [self._converter_resultado_para_entidade(linha) for linha in resultado_consulta]
+    return None
