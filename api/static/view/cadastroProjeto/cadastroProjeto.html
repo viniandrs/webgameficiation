@@ -1,0 +1,25 @@
+<div class="container mt-4">
+  <h2>Criar Novo Projeto</h2>
+
+  <form id="form-criar-projeto">
+    <div class="mb-3">
+      <label for="nome" class="form-label">Nome</label>
+      <input type="text" class="form-control" id="nome" name="nome" equired>
+    </div>
+
+    <div class="mb-3">
+      <label for="descricao" class="form-label">Descrição</label>
+      <textarea class="form-control" id="descricao" rows="3" name="descricao"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label for="xp_meta" class="form-label">Meta XP</label>
+      <input type="number" class="form-control" id="xp_meta" name="xp_meta" min="0">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <button type="button" class="btn btn-secondary ms-2" id="voltar">Cancelar</button>
+  </form>
+</div>
+
+<script src="view/cadastroProjeto/script.js"></script>

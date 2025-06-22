@@ -1,0 +1,30 @@
+<div class="container mt-4">
+  <h2>Editar Tarefa</h2>
+
+  <form id="form-editar-tarefa">
+    <div class="mb-3">
+      <label for="nome" class="form-label">Nome</label>
+      <input type="text" class="form-control" id="nome" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="descricao" class="form-label">Descrição</label>
+      <textarea class="form-control" id="descricao" rows="3"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label for="prazo" class="form-label">Prazo</label>
+      <input type="date" class="form-control" id="prazo">
+    </div>
+
+    <div class="mb-3">
+      <label for="xp_pontos" class="form-label">XP</label>
+      <input type="number" class="form-control" id="xp_pontos" min="0">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <button type="button" class="btn btn-secondary ms-2" id="voltar">Cancelar</button>
+  </form>
+</div>
+
+<script src="view/editarTarefa/script.js"></script>
