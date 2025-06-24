@@ -2,8 +2,9 @@
 
 from .BaseDao import BaseDao
 from ..modelos.Usuario import Usuario
+from .SingletonMeta import SingletonMeta
 
-class UsuarioDao(BaseDao):
+class UsuarioDao(BaseDao, metaclass = SingletonMeta):
   """
   Classe para gerenciar as interações com o banco de dados referentes a entidade Usuario
   """

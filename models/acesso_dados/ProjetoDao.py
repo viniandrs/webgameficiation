@@ -3,9 +3,10 @@
 from .BaseDao import BaseDao
 from ..modelos.Projeto import Projeto
 from ..modelos.ItemDeTrabalho import StatusItem
+from .SingletonMeta import SingletonMeta
 from datetime import date
 
-class ProjetoDao(BaseDao):
+class ProjetoDao(BaseDao, metaclass = SingletonMeta):
   """
   Classe para gerenciar as interações com o banco de dados referentes a entidade Projeto
   """

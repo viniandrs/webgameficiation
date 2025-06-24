@@ -1,7 +1,7 @@
 # tests/test_usuario_modelo.py
 
 import unittest
-from src.modelos.Usuario import Usuario
+from models.modelos.Usuario import Usuario
 
 
 class TestUsuarioModelo(unittest.TestCase):

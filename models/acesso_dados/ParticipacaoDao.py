@@ -4,8 +4,9 @@ from .BaseDao import BaseDao
 from ..modelos.Participacao import Participacao
 from ..modelos.Dono import Dono
 from ..modelos.Participante import Participante
+from .SingletonMeta import SingletonMeta
 
-class ParticipacaoDao(BaseDao):
+class ParticipacaoDao(BaseDao, metaclass = SingletonMeta):
   """
   Classe para gerenciar as interações com o banco de dados referentes a entidade Participacao
   """

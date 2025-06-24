@@ -3,9 +3,10 @@
 from .BaseDao import BaseDao
 from ..modelos.Tarefa import Tarefa
 from ..modelos.ItemDeTrabalho import StatusItem
+from .SingletonMeta import SingletonMeta
 from datetime import date, datetime
 
-class TarefaDao(BaseDao):
+class TarefaDao(BaseDao, metaclass = SingletonMeta):
   """
   Classe para gerenciar as interações com o banco de dados referentes a entidade Tarefa
   """
