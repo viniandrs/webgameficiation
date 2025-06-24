@@ -13,6 +13,8 @@ from models.modelos.Dono import Dono
 from models.modelos.Participante import Participante
 from models.modelos.ItemDeTrabalho import StatusItem
 from models.modelos.Usuario import Usuario
+from models.modelos.Participacao import Participacao
+from models.modelos.ItemDeTrabalho import ItemDeTrabalho
 
 from models.acesso_dados.UsuarioDao import UsuarioDao
 from models.acesso_dados.ProjetoDao import ProjetoDao
@@ -62,7 +64,7 @@ def serve_users_data():
 def api_login(usuario_id):
     usuario = usuariosDAO.buscar_por_id(usuario_id)
     if not usuario:
-        return jsonify({"error": "Usuário não encontrado"}), 404
+        return jsonify({"ok": False, "message": "Usuário não encontrado"}), 404
     session["usuario_id"] = usuario_id
     return jsonify({"success": True})
 
@@ -76,11 +78,12 @@ def api_criar_usuario():
         senha=data["senha"]
     )
 
-    try:
+    usuario_existente = usuariosDAO.buscar_por_email(novo_usuario.get_email())
+    if not usuario_existente:
         novo_usuario = usuariosDAO.inserir(novo_usuario)
-        return jsonify({"usuario_id": novo_usuario.get_id()})
-    except:
-        return jsonify({"usuario_id": None, "ok":False})
+        return jsonify({"ok": True, "usuario_id": novo_usuario.get_id()})
+    else:
+        return jsonify({"ok": False, "message": "Email já em uso"})
 
 @app.route("/api/usuario/verifica-senha", methods=["POST"])
 def api_verificar_senha_usuario():
@@ -120,29 +123,84 @@ def api_projeto_para_cliente_logado():
     projetos_usuario = []
     projetos = projetosDAO.buscar_por_usuario_id(usuario_id)
 
-    for proj in projetos:
-        projetos_usuario.append({"id": proj.get_id(), "nome": proj.get_nome()})
+    if projetos:
+        for proj in projetos:
+            projetos_usuario.append({"id": proj.get_id(), "nome": proj.get_nome()})
 
     return jsonify(projetos_usuario)
 
+def __verificar_sprint_completa(sprint_meta_id):
+    tarefas = tarefasDAO.buscar_tarefas_sprint(sprint_meta_id)
+    for tarefa in tarefas:
+        if tarefa.get_status() != StatusItem.CONCLUIDA:
+            return False
+        
+    return True
+
+def __alterar_bonus_responsaveis(projeto_id, sprint_meta_id, funcao):
+    participacoes = projetosDAO.buscar_membros_do_projeto(projeto_id)
+    tarefas = tarefasDAO.buscar_tarefas_sprint(sprint_meta_id)
+    for tarefa in tarefas:
+        for part in participacoes:
+            print(part)
+            if tarefa.get_participacao_responsavel_id() == part["id"]:
+                participacao_entidade = participacoesDAO.buscar_por_id(part["id"])
+                if funcao == 'adicionar':
+                    participacao_entidade.adicionar_xp(tarefa.get_xp_valor())
+                elif funcao == 'remover':
+                    participacao_entidade.remover_xp(tarefa.get_xp_valor())
+                participacoesDAO.atualizar(participacao_entidade)
+                tarefas.remove(tarefa)
+                participacoes.remove(part)
 
 @app.route("/api/item/<int:item_id>/concluir", methods=["POST"])
 def api_concluir_item(item_id):
-    try:
-        tarefasDAO.atualizar_status_tarefa(item_id, StatusItem.CONCLUIDA)
-    except:
-        return jsonify({"error": "Item não encontrado"}), 404
+    tarefa = tarefasDAO.buscar_por_id(item_id)
+    sprint_meta_id = tarefa.get_sprint_meta_id()
+
+    inicialmente_completa = __verificar_sprint_completa(sprint_meta_id)
+
+    participacao =participacoesDAO.buscar_por_id(tarefa.get_participacao_responsavel_id())
+    participacao.adicionar_xp(tarefa.get_xp_valor())
+    participacoesDAO.atualizar(participacao)
+    tarefasDAO.atualizar_status_tarefa(item_id, StatusItem.CONCLUIDA)
+
+    projeto = projetosDAO.buscar_por_id(tarefa.get_projeto_id())
+    projeto.adicionar_xp(tarefa.get_xp_valor())
+    projetosDAO.atualizar(projeto)
+
+    final_completa = __verificar_sprint_completa(sprint_meta_id)
+
+    print(inicialmente_completa, final_completa)
+
+    if not inicialmente_completa and final_completa:
+        __alterar_bonus_responsaveis(tarefa.get_projeto_id(), sprint_meta_id, 'adicionar')
     
-    return jsonify({"success": True})
+    return jsonify({"ok": True})
 
 
 @app.route("/api/item/<int:item_id>/inacabada", methods=["POST"])
 def api_desconcluir_item(item_id):
-    try:
-        tarefasDAO.atualizar_status_tarefa(item_id, StatusItem.PENDENTE)
-    except:
-        return jsonify({"error": "Item não encontrado"}), 404
-    return jsonify({"success": True})
+    tarefa = tarefasDAO.buscar_por_id(item_id)
+    sprint_meta_id = tarefa.get_sprint_meta_id()
+
+    inicialmente_completa = __verificar_sprint_completa(sprint_meta_id)
+
+    participacao =participacoesDAO.buscar_por_id(tarefa.get_participacao_responsavel_id())
+    participacao.remover_xp(tarefa.get_xp_valor())
+    participacoesDAO.atualizar(participacao)
+    tarefasDAO.atualizar_status_tarefa(item_id, StatusItem.PENDENTE)
+
+    projeto = projetosDAO.buscar_por_id(tarefa.get_projeto_id())
+    projeto.remover_xp(tarefa.get_xp_valor())
+    projetosDAO.atualizar(projeto)
+
+    final_completa = __verificar_sprint_completa(sprint_meta_id)
+
+    if inicialmente_completa and not final_completa:
+        __alterar_bonus_responsaveis(tarefa.get_projeto_id(), sprint_meta_id, 'remover')
+
+    return jsonify({"ok": True})
 
 
 @app.route("/api/participante/<int:projeto_id>")
@@ -151,19 +209,17 @@ def api_participante_projeto(projeto_id):
     if not usuario_id:
         return jsonify()
 
-    try:
-        participacao = participacoesDAO.buscar_participacao_usuario_projeto(usuario_id, projeto_id)
-        dados ={
-            "id": participacao.get_id(),
-            "usuario_id": participacao.get_usuario_id(),
-            "projeto_id": participacao.get_projeto_id(),
-            "classificacao": participacao.get_classificacao(),
-            "xp": participacao.get_xp(),
-            "ativo": participacao.is_ativa()
-        }
-        return jsonify(dados)
-    except Exception as e:
-        return jsonify({"status": False})
+    participacao = participacoesDAO.buscar_participacao_usuario_projeto(usuario_id, projeto_id)
+
+    dados ={
+        "id": participacao.get_id(),
+        "usuario_id": participacao.get_usuario_id(),
+        "projeto_id": participacao.get_projeto_id(),
+        "classificacao": participacao.get_classificacao(),
+        "xp": participacao.get_xp(),
+        "ativo": participacao.is_ativa()
+    }
+    return jsonify(dados)
 
 
 @app.route("/api/page/cadastroTarefa")
@@ -181,27 +237,30 @@ def api_criar_tarefa():
         nome=data["nome"],
         descricao=data["descricao"],
         prazo=data["prazo"],
-        xp_valor=data["xp_pontos"],
+        xp_valor=int(data["xp_pontos"]),
         status=StatusItem.AGUARDANDO_REASSIGNACAO,
         sprint_meta_id=data["sprint_id"],
         participacao_responsavel_id=None,
         projeto_id=sprint.get_projeto_id()
     )
 
-    try:
-        tarefasDAO.inserir(nova_tarefa)
-    except:
-        return jsonify({"ok": False})
+    nova_tarefa = tarefasDAO.inserir(nova_tarefa)
+
+    projeto = projetosDAO.buscar_por_id(nova_tarefa.get_projeto_id())
+    projeto.set_xp_meta(projeto.get_xp_meta() + nova_tarefa.get_xp_valor())
+    projetosDAO.atualizar(projeto)
 
     return jsonify({"ok": True})
 
 
 @app.route("/api/tarefa/<int:tarefa_id>", methods=["DELETE"])
 def excluir_tarefa(tarefa_id):
-    try:
-        tarefasDAO.remover(tarefa_id)
-    except:
-        return "", 404
+    tarefa = tarefasDAO.buscar_por_id(tarefa_id)
+    projeto = projetosDAO.buscar_por_id(tarefa.get_projeto_id())
+    if tarefa.get_xp_valor():
+        projeto.set_xp_meta(projeto.get_xp_meta() - tarefa.get_xp_valor())
+        projetosDAO.atualizar(projeto)
+    tarefasDAO.remover(tarefa_id)
     return "", 204
 
 
@@ -230,11 +289,20 @@ def get_tarefa(tarefa_id):
 def atualizar_tarefa(tarefa_id):
     data = request.get_json()
     tarefa = tarefasDAO.buscar_por_id(tarefa_id)
+
+    antigos_pontos = tarefa.get_xp_valor()
+
     tarefa.set_nome(data["nome"])
     tarefa.set_descricao(data["descricao"])
     tarefa.set_prazo(data["prazo"])
     tarefa.set_xp_valor(data["xp_pontos"])
     tarefasDAO.atualizar(tarefa)
+
+    if tarefa.get_xp_valor() != antigos_pontos:
+        diferenca = tarefa.get_xp_valor() - antigos_pontos
+        projeto = projetosDAO.buscar_por_id(tarefa.get_projeto_id())
+        projeto.set_xp_meta(projeto.get_xp_meta() + diferenca)
+        projetosDAO.atualizar(projeto)
 
     return jsonify({"ok": True})
 
@@ -242,6 +310,12 @@ def atualizar_tarefa(tarefa_id):
 @app.route("/api/sprint/<int:sprint_id>", methods=["DELETE"])
 def excluir_sprint(sprint_id):
     try:
+        tarefas = tarefasDAO.buscar_tarefas_sprint(sprint_id)
+        soma_xp = sum([tarefa.get_xp_valor() for tarefa in tarefas])
+        if soma_xp:
+            projeto = projetosDAO.buscar_por_id(tarefas[0].get_projeto_id())
+            projeto.set_xp_meta(projeto.get_xp_meta() - soma_xp)
+            projetosDAO.atualizar(projeto)
         sprint_metasDAO.remover(sprint_id)
     except:
         return jsonify({"ok": False})
@@ -326,7 +400,6 @@ def atualizar_projeto(projeto_id):
         projeto = projetosDAO.buscar_por_id(projeto_id)
         projeto.set_nome(data["nome"])
         projeto.set_descricao(data["nome"])
-        projeto.set_xp_meta(data["xp_meta"])
 
         projetosDAO.atualizar(projeto)
     except:
@@ -341,20 +414,19 @@ def api_criar_projeto():
     novo_projeto = Projeto(
         nome=data["nome"],
         descricao=data.get("descricao", ""),
-        xp_meta=data["xp_meta"],
+        xp_meta=0,
         xp_acumulado=0,
     )
 
     id_usuario = session.get("usuario_id")
-    projeto = None
     try:
-        projeto = projetosDAO.inserir(novo_projeto)
+        novo_projeto = projetosDAO.inserir(novo_projeto)
     except:
         return jsonify("ok", False)
 
     participante_criador = Dono(
         usuario_id= id_usuario,
-        projeto_id= projeto.get_id(),
+        projeto_id= novo_projeto.get_id(),
         xp_participacao= 0,
         ativa=True
     )
@@ -364,7 +436,7 @@ def api_criar_projeto():
     except:
         return jsonify("ok", False)
 
-    return jsonify({"projeto_id":participante_criador.get_id()})
+    return jsonify({"ok": True,"projeto_id":novo_projeto.get_id()})
 
 
 def achar_tarefas(sprint_id):
@@ -425,48 +497,49 @@ def atualizar_responsavel(id_tarefa):
     dados = request.get_json()
     responsavel_id = dados.get("responsavel_id")
 
-    try:
-        tarefa = tarefasDAO.buscar_por_id(id_tarefa)
-        tarefa.set_participacao_responsavel_id(responsavel_id)
-        tarefasDAO.atualizar(tarefa)
-    except:
-        return jsonify({"ok": False})
+    tarefa = tarefasDAO.buscar_por_id(id_tarefa)
+    tarefa.set_participacao_responsavel_id(responsavel_id)
+    if tarefa.get_status() == StatusItem.AGUARDANDO_REASSIGNACAO:
+        tarefa.set_status(StatusItem.PENDENTE)
+    tarefasDAO.atualizar(tarefa)
 
     return jsonify({"ok": True})
 
 
 @app.route("/api/projeto/<int:id_projeto>/participantes")
 def participantes_projeto_todos(id_projeto):
-    participante_json = []
-
     participantes = projetosDAO.buscar_membros_do_projeto(id_projeto)
-    print(participantes)
 
     return jsonify(participantes)
 
 
 @app.route("/api/projeto/<int:id_projeto>/ranking")
 def ranking_projeto(id_projeto):
-    participante_json = []
-
     participantes = projetosDAO.buscar_membros_do_projeto(id_projeto)
 
-    return jsonify(participantes)
+    return jsonify(participantes[:9])
 
 
 @app.route("/api/projeto/participante/<int:participacao_id>", methods=["PUT"])
 def atualizar_participacao(participacao_id):
     data = request.get_json()
-    classificacao = data.get("classificacao")
-    habilitado = data.get("habilitado")
+    habilitado = data["habilitado"]
+    
+    participante = participacoesDAO.buscar_por_id(participacao_id)
+    participante.set_ativa(habilitado)
 
-    try:
-        participante = participacoesDAO.buscar_por_id(participacao_id)
-        participante.set_ativa(habilitado)
+    if not habilitado:
+        tarefas = tarefasDAO.buscar_tarefas_por_id_participacao_responsavel(participacao_id)
+        if tarefas:
+            for tarefa in tarefas:
+                if tarefa.get_status() == StatusItem.PENDENTE:
+                    tarefa.set_participacao_responsavel_id(None)
+                    tarefa.set_status(StatusItem.AGUARDANDO_REASSIGNACAO)
+                    tarefasDAO.atualizar(tarefa)
+                    break
 
-        participacoesDAO.atualizar(participante)
-    except:
-        return jsonify({"ok": False})
+    participacoesDAO.atualizar(participante)
+    
     return jsonify({"ok": True})
 
 
@@ -480,11 +553,17 @@ def usuario_solicita_entrar_projeto(id_projeto):
         xp_participacao=0, 
         ativa=False
     )
-    try:
+
+    part_existente = participacoesDAO.buscar_participacao_usuario_projeto(usuario_id=id_usuario, projeto_id=id_projeto)
+
+    if not part_existente:
         participacoesDAO.inserir(nova_participacao)
-    except:
-        return jsonify({"ok": False})
-    return jsonify({"ok": True})
+        return jsonify({"ok": True})
+    else:
+        return jsonify({
+            "ok": False, 
+            "message": "usuário já solicitou entrada"
+        })
 
 
 if __name__ == "__main__":

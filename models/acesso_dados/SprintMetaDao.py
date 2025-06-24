@@ -76,7 +76,6 @@ class SprintMetaDao(BaseDao):
     if sprint.get_data_alvo():
       prazo = datetime.fromisoformat(sprint.get_data_alvo()).isoformat()
 
-    
     return (
       sprint.get_projeto_id(),
       sprint.get_nome(),

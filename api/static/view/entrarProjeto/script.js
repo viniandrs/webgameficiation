@@ -8,6 +8,7 @@ function buscarProjeto(){
     .then(projeto => {
         const container = document.getElementById("projeto_buscado")
         container.innerHTML = ''
+        document.getElementById("container-button").innerHTML = ''
         if (projeto) {
             const h1 = document.createElement("h1")
             h1.innerHTML = projeto.nome
@@ -20,7 +21,7 @@ function buscarProjeto(){
             botao_solicitar.innerHTML = "Solicitar"
             botao_solicitar.addEventListener("click", e => {solicitar_acesso(projeto.id)})
 
-            document.getElementsByClassName("container-header")[0].appendChild(botao_solicitar)
+            document.getElementById("container-button").appendChild(botao_solicitar)
             container.appendChild(h1)
             container.appendChild(p)
         } else {
@@ -30,15 +31,22 @@ function buscarProjeto(){
 
 }
 
-function solicitar_acesso(projeto_id){
-    fetch(`/api/projeto/${projeto_id}/solicitar_entrar`, {
-    method: 'POST'
-  })
-    .then(res => {
-      if (res.ok) {
-        alert("Solicitação enviada!");
-      } else {
-        alert("Erro ao solicitar.");
-      }
+async function solicitar_acesso(projeto_id) {
+  try {
+    const res = await fetch(`/api/projeto/${projeto_id}/solicitar_entrar`, {
+      method: 'POST'
     });
+
+    const body = await res.json();
+
+    if (body.ok ) {
+      alert("Solicitação enviada!");
+    } else {
+      alert(body.message);
+    }
+  } catch (err) {
+    console.error("Erro na solicitação:", err);
+    alert("Erro ao enviar solicitação.");
+  }
 }
+

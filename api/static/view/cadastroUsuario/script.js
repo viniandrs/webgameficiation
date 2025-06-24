@@ -12,15 +12,17 @@ function initPage(params) {
       body: JSON.stringify(body),
     });
 
-    if (response.ok) {
-        alert("Logado com sucesso")
-        console.log(response)
-        await fetch('/api/login/'+response.usuario_id, {
-          method: 'POST'
-        });
-        loadPage('home');
+    const resp = await response.json();
+
+    if (resp.ok ) {
+      alert("Logado com sucesso")
+      console.log(resp)
+      await fetch('/api/login/'+resp.usuario_id, {
+        method: 'POST'
+      });
+      loadPage('home');
     } else {
-      alert('Erro ao criar Usuario');
+      alert(resp.message);
     }
   });
 }

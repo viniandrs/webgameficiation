@@ -9,24 +9,21 @@ function initPage(params) {
 async function renderProjeto(projeto) {
   const res = await fetch('/api/participante/' + projeto.id);
   const participante = await res.json();
-
-  console.log(participante)
-  
   const content = document.getElementById('content');
   content.innerHTML = `
     <div class="container mt-4">
       <h1>${projeto.nome}</h1>
       <h3>${projeto.descricao}</h3>
+      <h6 id="ud_sala">ID do Projeto: ${projeto.id}</h6>
       ${participante.classificacao=="DONO" ? `<button class="btn btn-sm btn-outline-secondary ms-2" onclick="editarProjeto(${projeto.id})">Editar Projeto</button>` : ''}
       ${participante.classificacao=="DONO" ? `<button class="btn btn-sm btn-outline-danger ms-2" onclick="excluirProjeto(${projeto.id})">Excluir Projeto</button>` : ''}
       ${participante.classificacao=="DONO" ? `<button class="btn btn-sm btn-outline-info ms-2" onclick="handleParticipantes(${projeto.id})">Gerenciar Participantes</button>` : ''}
-
       <p id="classificacao_usuario">Classificação: ${participante.classificacao}</p>
-      <p id="classificacao_usuario">Contribuição: ${participante.xp}xp</p>
+      <p id="classificacao_usuario">Contribuição: <span id="span_xp">${participante.xp}</span>xp</p>
       <button class="btn btn-sm btn-outline-info ms-2" onclick="handleRanking(${projeto.id})">Gerar ranking Contribuicoes</button>
 
       <div class="my-4">
-      <h5>Progresso do Projeto</h5>
+      <h5>Progresso do Projeto / ${projeto.xp_meta}xp</h5>
       <div class="progress">
         <div class="progress-bar bg-success" role="progressbar"
             style="width: ${Math.min(100, (projeto.xp_acumulado / projeto.xp_meta) * 100)}%"
@@ -62,17 +59,22 @@ async function renderSprintsComTarefas(sprints, id_projeto, participante) {
   sprints.forEach((sprint, sprintIndex) => {
     const sprintDiv = document.createElement('div');
     sprintDiv.className = 'mb-4';
-
     const header = document.createElement('div');
     header.className = 'd-flex align-items-center justify-content-between';
 
+    const divTitulo = document.createElement("div")
+    divTitulo.className = 'd-flex'
     const titulo = document.createElement('h5');
     titulo.className = 'mb-2';
-    titulo.textContent = sprint.nome
+    titulo.innerHTML = "<strong>"+sprint.nome+"</strong>"
     titulo.style.cursor = 'pointer'
     titulo.addEventListener("click", (e)=>{
       handleDetalhesSprint(e, sprint, id_projeto, participante.classificacao)
     })
+    const infos = document.createElement("p")
+    infos.textContent = " ("+sprint.xp_valor+"xp)  -  "+ sprint.data
+    divTitulo.appendChild(titulo)
+    divTitulo.appendChild(infos)
 
     const botaoAdicionar = document.createElement('button');
     botaoAdicionar.className = 'btn btn-sm btn-outline-primary';
@@ -83,7 +85,7 @@ async function renderSprintsComTarefas(sprints, id_projeto, participante) {
         projeto_id: id_projeto
       });
 
-    header.appendChild(titulo);
+    header.appendChild(divTitulo);
     if(participante.classificacao == "DONO") header.appendChild(botaoAdicionar);
     sprintDiv.appendChild(header);
 
@@ -91,8 +93,9 @@ async function renderSprintsComTarefas(sprints, id_projeto, participante) {
     tarefasDiv.className = 'ps-3';
 
     sprint.tarefas.forEach((item, tarefaIndex) => {
-      const canCheck = participante.classificacao == 'DONO' || item.participacao_responsavel_id === participante.id;
-      const statusClass = item.status == 'concluida' ? 'bg-success text-white' : 'bg-danger text-white';
+      const canCheck = (participante.classificacao == 'DONO' || item.participacao_responsavel_id === participante.id);
+      let [statusClass, textoMostrado] = acharCorStatus(item.status)
+
       const itemId = `sprint-${sprintIndex}-tarefa-${tarefaIndex}`;
 
       const itemWrapper = document.createElement('div');
@@ -101,10 +104,10 @@ async function renderSprintsComTarefas(sprints, id_projeto, participante) {
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.name = item.id;
-      checkbox.checked = item.status === 'concluida';
-      checkbox.disabled = !canCheck;
+      checkbox.checked = item.status === 'CONCLUIDA';
+      checkbox.disabled = !canCheck || item.status == "AGUARDANDO_REASSIGNACAO";
       checkbox.className = 'custom-circle-checkbox me-3';
-      checkbox.addEventListener('change', () => toggleConcluir(item.id, checkbox));
+      checkbox.addEventListener('change', () => toggleConcluir(item.id, checkbox, id_projeto));
 
       const accordion = document.createElement('div');
       accordion.className = 'accordion w-100';
@@ -121,25 +124,28 @@ async function renderSprintsComTarefas(sprints, id_projeto, participante) {
                 <div class="fw-semibold me-3">${item.nome}</div>
                 <div class="ms-auto text-end">
                   <div class="text-muted small">${item.data || ''}</div>
-                  <span class="badge ${statusClass}">${item.status}</span>
-              ${canCheck ? `<button class="btn btn-sm btn-outline-danger ms-2" onclick="excluirTarefa(${item.id}, ${id_projeto})">🗑</button>` : ''}
+                  <span class="badge ${statusClass}">${textoMostrado}</span>
+              ${participante.classificacao == 'DONO' ? `<button class="btn btn-sm btn-outline-danger ms-2" onclick="excluirTarefa(${item.id}, ${id_projeto})">🗑</button>` : ''}
                 </div>
               </button>
             </div>
           </h2>
           <div id="collapse-${itemId}" class="accordion-collapse collapse" aria-labelledby="heading-${itemId}" data-bs-parent="#accordion-${itemId}">
             <div class="accordion-body">
-              <p>
+             <div class="row">
+              <div class="col-6">
                 <strong>Responsável:</strong>
-                  <select ${canCheck? '': 'disabled'} class="form-select form-select-sm w-auto d-inline ms-2" data-tarefa-id="${item.id}" onchange="atualizarResponsavel(this, ${id_projeto})">
+                  <select ${(canCheck && item.status !='CONCLUIDA') ||  item.status == 'AGUARDANDO_REASSIGNACAO'? '': 'disabled'} id="select-${item.id}" class="form-select form-select-sm w-auto d-inline ms-2" data-tarefa-id="${item.id}" onchange="atualizarResponsavel(this, ${id_projeto})">
                     <option value="">Carregando...</option>
                   </select>
-              </p>
+              </div>
+              <div class="col-6"><strong>Prazo:</strong> ${item.prazo}</div>
+             </div>
 
 
-              <p>${item.descricao || 'Sem descrição.'}</p>
+              <p><strong>Descrição: </strong>${item.descricao || 'Sem descrição.'}</p>
               <p><strong>XP valor:</strong> ${item.xp_valor|| 0}</p>
-              ${canCheck ? `<button class="btn btn-sm btn-outline-secondary mt-2" onclick="editarTarefa(${item.id}, ${id_projeto})">Editar</button>` : ''}
+              ${participante.classificacao == 'DONO' ? `<button class="btn btn-sm btn-outline-secondary mt-2" onclick="editarTarefa(${item.id}, ${id_projeto})">Editar</button>` : ''}
             </div>
           </div>
         </div>
@@ -148,7 +154,7 @@ async function renderSprintsComTarefas(sprints, id_projeto, participante) {
       itemWrapper.appendChild(accordion);
       tarefasDiv.appendChild(itemWrapper);
 
-      createListenerSelect(accordion, item, id_projeto)
+      createListenerSelect(accordion, item, id_projeto, participante)
       
     });
 
@@ -157,35 +163,54 @@ async function renderSprintsComTarefas(sprints, id_projeto, participante) {
   });
 }
 
-function createListenerSelect(accordion, item, id_projeto){
+function createListenerSelect(accordion, item, id_projeto, participante){
   fetch(`/api/projeto/${id_projeto}/participantes`)
     .then(res => res.json())
     .then(participantes => {
       const select = accordion.querySelector(`[data-tarefa-id="${item.id}"]`);
       select.innerHTML = '';
-      participantes.forEach(p => {
-        if(p.participacao_habilitada){
-          const option = document.createElement('option');
-          option.value = p.usuario_id;
-          option.textContent = p.usuario_nome;
-          if (p.usuario_id == item.participacao_responsavel_id) option.selected = true;
-          select.appendChild(option);     
-        }
-      });
+      const opcaoVazia = document.createElement('option');
+      opcaoVazia.value = "";
+      select.appendChild(opcaoVazia)
+
+      if(item.status== 'AGUARDANDO_REASSIGNACAO' && participante.classificacao=='PARTICIPANTE'){
+        const option_unica = document.createElement('option');
+        option_unica.value = participante.id;
+        option_unica.textContent = "atribuir para si";
+        select.appendChild(option_unica)
+      }else{
+        participantes.forEach(p => {
+          if(p.participacao_habilitada){
+            const option = document.createElement('option');
+            option.value = p.id;
+            option.textContent = p.usuario_nome;
+            if (p.id == item.participacao_responsavel_id) option.selected = true;
+            select.appendChild(option);     
+          }
+        });
+      }
     });
 }
 
-function toggleConcluir(itemId, checkboxEl) {
+function toggleConcluir(itemId, checkboxEl, id_projeto) {
   const wrapper = checkboxEl.closest('.d-flex');
   const badge = wrapper.querySelector('.badge');
 
   const concluida = checkboxEl.checked;
-  const endpoint = concluida ? `/api/item/${itemId}/concluir` : `/api/item/${itemId}/inacabada`;
+  let endpoint
+  if(concluida) {
+    endpoint = `/api/item/${itemId}/concluir`
+  }else{
+    endpoint = `/api/item/${itemId}/inacabada`
+  }
 
   fetch(endpoint, { method: 'POST' })
-    .then(() => {
-      badge.className = 'badge ' + (concluida ? 'bg-success text-white' : 'bg-danger text-white');
-      badge.textContent = concluida ? 'concluida' : 'pendente';
+    .then(res => {
+      if (res.ok) {
+        loadPage("projeto", {id: id_projeto})
+      } else {
+        alert("Erro ao excluir tarefa.");
+      }
     });
 }
 
@@ -313,7 +338,6 @@ function handleRanking(projeto_id){
     const detalhes_container = document.getElementById("detalhes_container")
     detalhes_container.innerHTML = ''
     let texto_dados = ''
-    console.log(participantes)
     if(participantes){
       let contador = 1
       
@@ -322,7 +346,6 @@ function handleRanking(projeto_id){
         contador++
       })
 
-      console.log(texto_dados)
       const card_div = document.createElement("div")
       card_div.innerHTML= `        
       <div class="card">
@@ -337,4 +360,17 @@ function handleRanking(projeto_id){
       detalhes_container.innerHTML = 'Erro ao carregar Ranking'
     }
   })
+}
+
+function acharCorStatus(status){
+  switch (status) {
+    case 'CONCLUIDA':
+      return ['bg-success text-white', 'concluida']
+    case 'PENDENTE':
+      return ['bg-danger text-white', 'pendente']
+    case 'AGUARDANDO_REASSIGNACAO':
+      return ['bg-warning text-white', 'aguardando responsável']
+    default:
+      return ['bg-secondary', 'status desconhecido']
+  }
 }

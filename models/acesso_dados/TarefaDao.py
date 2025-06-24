@@ -109,7 +109,7 @@ class TarefaDao(BaseDao):
     #Converte o prazo de um objeto date para uma string no formato ISO
     prazo = None
     if tarefa.get_prazo():
-      prazo = datetime.fromisoformat(tarefa.get_prazo()).isoformat()
+      prazo = datetime.fromisoformat(str(tarefa.get_prazo())).isoformat()
     
     return (
       tarefa.get_nome(),
@@ -175,6 +175,26 @@ class TarefaDao(BaseDao):
     status_str = novo_status.name
     self._executar_consulta(sql, (status_str, tarefa_id))
   
+  def buscar_tarefas_por_id_participacao_responsavel(self, participacao_responsavel_id):
+    """
+    Busca todas as tarefas que tem como responsavel um participante ou dono em específico
+
+    Args: 
+      participacao_responsavel_id (int): Identificador do participante ou dono usado na busca
+
+    Returns:
+      lista de Tarefas: Lista contendo todas as tarefas associadas ao participante ou dono
+    """
+    sql = """
+    SELECT 
+    id, projeto_id, titulo, descricao, xp_valor, status, 
+    participacao_responsavel_id, prazo, sprint_meta_id
+    FROM tarefas
+    WHERE participacao_responsavel_id = ?
+    """
+    resultados = self._obter_todos(sql, (participacao_responsavel_id,))
+    return [self._converter_resultado_para_entidade(linha) for linha in resultados]
+
   def buscar_tarefas_projeto(self, projeto_id):
     """
     Busca todas as tarefas associadas a um projeto
