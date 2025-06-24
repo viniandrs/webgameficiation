@@ -143,16 +143,16 @@ def __alterar_bonus_responsaveis(projeto_id, sprint_meta_id, funcao):
     sprint = sprint_metasDAO.buscar_por_id(sprint_meta_id)
     for tarefa in tarefas:
         for part in participacoes:
-            print(part)
             if tarefa.get_participacao_responsavel_id() == part["id"]:
                 participacao_entidade = participacoesDAO.buscar_por_id(part["id"])
                 if funcao == 'adicionar':
+                    print(tarefa.get_participacao_responsavel_id(), participacao_entidade.get_id())
                     participacao_entidade.adicionar_xp(sprint.get_xp_valor())
+                    print("adicionou ", sprint.get_xp_valor())
                 elif funcao == 'remover':
                     participacao_entidade.remover_xp(sprint.get_xp_valor())
+                    print("removeu ",sprint.get_xp_valor())
                 participacoesDAO.atualizar(participacao_entidade)
-                tarefas.remove(tarefa)
-                participacoes.remove(part)
 
 @app.route("/api/item/<int:item_id>/concluir", methods=["POST"])
 def api_concluir_item(item_id):
@@ -171,8 +171,6 @@ def api_concluir_item(item_id):
     projetosDAO.atualizar(projeto)
 
     final_completa = __verificar_sprint_completa(sprint_meta_id)
-
-    print(inicialmente_completa, final_completa)
 
     if not inicialmente_completa and final_completa:
         __alterar_bonus_responsaveis(tarefa.get_projeto_id(), sprint_meta_id, 'adicionar')
@@ -199,6 +197,7 @@ def api_desconcluir_item(item_id):
     final_completa = __verificar_sprint_completa(sprint_meta_id)
 
     if inicialmente_completa and not final_completa:
+        print("desfez completo")
         __alterar_bonus_responsaveis(tarefa.get_projeto_id(), sprint_meta_id, 'remover')
 
     return jsonify({"ok": True})
