@@ -3,9 +3,10 @@
 from .BaseDao import BaseDao
 from ..modelos.SprintMeta import SprintMeta
 from ..modelos.ItemDeTrabalho import StatusItem
+from .SingletonMeta import SingletonMeta
 from datetime import date, datetime
 
-class SprintMetaDao(BaseDao):
+class SprintMetaDao(BaseDao, metaclass = SingletonMeta):
   """
   Classe para gerenciar as interações com o banco de dados referentes à entidade SprintMeta
   """

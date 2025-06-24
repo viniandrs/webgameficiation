@@ -33,7 +33,7 @@ class TestUsuarioDao(unittest.TestCase):
 
         # MOCAR a função obter_conexao para que ela retorne conexão em memória.
         self.patcher_obter_conexao = patch(
-            "src.acesso_dados.BaseDao.obter_conexao", return_value=self.conexao_teste
+            "models.acesso_dados.BaseDao.obter_conexao", return_value=self.conexao_teste
         )
         self.patcher_obter_conexao.start()
 
@@ -104,6 +104,17 @@ class TestUsuarioDao(unittest.TestCase):
         self.dao.remover(usuario_a_remover.get_id())
 
         self.assertIsNone(self.dao.buscar_por_id(usuario_a_remover.get_id()))
+    
+    def test_singleton_instancia_unica(self):
+        """Verifica se a UsuarioDao retorna a mesma instância."""
+        dao1 = UsuarioDao()
+        dao2 = UsuarioDao()
+        dao3 = UsuarioDao()
+
+        self.assertIs(dao1, dao2)
+        self.assertIs(dao1, dao3)
+        self.assertIs(dao2, dao3)
+        self.assertEqual(id(dao1), id(dao2))
 
 
 if __name__ == "__main__":
