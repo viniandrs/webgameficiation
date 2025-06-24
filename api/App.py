@@ -140,15 +140,16 @@ def __verificar_sprint_completa(sprint_meta_id):
 def __alterar_bonus_responsaveis(projeto_id, sprint_meta_id, funcao):
     participacoes = projetosDAO.buscar_membros_do_projeto(projeto_id)
     tarefas = tarefasDAO.buscar_tarefas_sprint(sprint_meta_id)
+    sprint = sprint_metasDAO.buscar_por_id(sprint_meta_id)
     for tarefa in tarefas:
         for part in participacoes:
             print(part)
             if tarefa.get_participacao_responsavel_id() == part["id"]:
                 participacao_entidade = participacoesDAO.buscar_por_id(part["id"])
                 if funcao == 'adicionar':
-                    participacao_entidade.adicionar_xp(tarefa.get_xp_valor())
+                    participacao_entidade.adicionar_xp(sprint.get_xp_valor())
                 elif funcao == 'remover':
-                    participacao_entidade.remover_xp(tarefa.get_xp_valor())
+                    participacao_entidade.remover_xp(sprint.get_xp_valor())
                 participacoesDAO.atualizar(participacao_entidade)
                 tarefas.remove(tarefa)
                 participacoes.remove(part)
@@ -399,7 +400,7 @@ def atualizar_projeto(projeto_id):
     try:
         projeto = projetosDAO.buscar_por_id(projeto_id)
         projeto.set_nome(data["nome"])
-        projeto.set_descricao(data["nome"])
+        projeto.set_descricao(data["descricao"])
 
         projetosDAO.atualizar(projeto)
     except:
