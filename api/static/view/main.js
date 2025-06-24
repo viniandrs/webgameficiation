@@ -46,11 +46,12 @@ async function updateCurrentUserDisplay() {
 
     if (data.usuario) {
       el.textContent = `Usuário: ${data.usuario.nome}`;
+      document.getElementById("nav-buttons").style.display = "block"
+      await carregarProjetos();
     } else {
       el.textContent = '';
+      document.getElementById("nav-buttons").style.display = "none"
     }
-
-    await carregarProjetos();
   } catch {
     document.getElementById('current-user').textContent = '';
     renderProjectList([]);
@@ -118,5 +119,4 @@ document.getElementById('logout')?.addEventListener('click', async e => {
   loadPage('login');
 });
 
-// Primeira carga
 loadPage('home');

@@ -137,12 +137,13 @@ class ProjetoDao(BaseDao):
     SELECT 
     user.id AS usuario_id, 
     user.nome AS usuario_nome, 
+    part.id,
     part.xp_participacao, 
     part.classificacao, 
     part.participacao_habilitada
     FROM usuarios AS user
     JOIN participacoes AS part ON user.id = part.usuario_id
-    WHERE part.projeto_id = ? AND part.participacao_habilitada = 1
+    WHERE part.projeto_id = ?
     ORDER BY part.xp_participacao DESC;
     """
     resultado = self._obter_todos(sql, (projeto_id, ))
@@ -153,6 +154,7 @@ class ProjetoDao(BaseDao):
       membros.append({
         'usuario_id': membro['usuario_id'],
         'usuario_nome': membro['usuario_nome'],
+        'id': membro['id'],
         'classificacao': membro['classificacao'],
         'xp_participacao': membro['xp_participacao'],
         'participacao_habilitada': membro['participacao_habilitada']
@@ -176,7 +178,7 @@ class ProjetoDao(BaseDao):
     sql = """
     SELECT projetos.*
     FROM projetos
-    JOIN participacoes ON projetos.id = participacoes.projeto_id
+    JOIN participacoes ON projetos.id = participacoes.projeto_id AND participacoes.participacao_habilitada=1
     WHERE participacoes.usuario_id = ?;
     """
     resultado_consulta = self._obter_todos(sql, (usuario_id,))

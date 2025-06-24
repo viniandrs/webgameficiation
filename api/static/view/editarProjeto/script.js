@@ -6,7 +6,6 @@ function initPage(params) {
     .then(projeto => {
       document.getElementById('nome').value = projeto.nome;
       document.getElementById('descricao').value = projeto.descricao;
-      document.getElementById('xp_meta').value = projeto.xp_meta;
     });
 
   const form = document.getElementById('form-editar-projeto');
@@ -16,7 +15,6 @@ function initPage(params) {
     const dados = {
       nome: document.getElementById('nome').value,
       descricao: document.getElementById('descricao').value,
-      xp_meta: parseInt(document.getElementById('xp_meta').value)
     };
 
     const res = await fetch(`/api/projeto/${projeto_id}`, {

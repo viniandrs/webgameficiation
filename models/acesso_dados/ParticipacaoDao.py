@@ -86,7 +86,6 @@ class ParticipacaoDao(BaseDao):
     Returns:
       tuple: Tupla com os valores dos atributos em ordem para a atualização
     """
-
     return (
       participacao.get_xp(),
       1 if participacao.is_ativa() else 0,
